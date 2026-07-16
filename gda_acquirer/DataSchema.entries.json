@@ -1,0 +1,39 @@
+{
+  "_comment": "Append these two objects to the `datasets` array in D:\\Work\\GDA\\v1\\DataSchema.json (schemaVersion 3.0.0). Do NOT paste this wrapper object — only the two entries below.",
+  "entries": [
+    {
+      "id": "GridWitness/gw_electrical",
+      "displayName": "GridWitness crowd electrical (frequency/voltage/current/power, HA nodes)",
+      "source": { "provider": "GridWitness", "url": "https://github.com/gridwitness/gridwitness" },
+      "storage": {
+        "parquetPath": "DataSources/GridWitness/Parquet/gw_electrical",
+        "format": "parquet",
+        "partitioning": "year/week",
+        "partitionScheme": "hive year=YYYY/week=WW (ISO week)",
+        "sampleFile": "DataSources/GridWitness/Parquet/gw_electrical/year=2026/week=28/gw_electrical_2026w28.parquet"
+      },
+      "schema": {
+        "parquet": {
+          "notes": "Long/tidy, one row per phase. Cols: ts_utc(datetime UTC), node_id(str, random - not personal), phase(L1|L2|L3|1p), ts_source(device|ha_receive|gps), voltage_v, current_a, power_w, power_factor, frequency_hz(node-global), phase_angle_deg(T3/PMU, P2), device_type, firmware, cadence_ms, loc_tier(anon|region|data_share), loc_ref(derived GSP-group/substation - NEVER a postcode). Plus provenance year/week/database. PRIVACY CONTRACT: rows carry no postcode, lat/lon, token, or contributor identity by construction (server allow-list projection). Pre-calibration frequency has unknown clock offset - treat as source='gridwitness', down-weight until NESO self-sync calibration lands."
+        }
+      }
+    },
+    {
+      "id": "GridWitness/gw_weather",
+      "displayName": "GridWitness crowd weather stations (HA nodes, Meteostat-shaped)",
+      "source": { "provider": "GridWitness", "url": "https://github.com/gridwitness/gridwitness" },
+      "storage": {
+        "parquetPath": "DataSources/GridWitness/Parquet/gw_weather",
+        "format": "parquet",
+        "partitioning": "year/week",
+        "partitionScheme": "hive year=YYYY/week=WW (ISO week)",
+        "sampleFile": "DataSources/GridWitness/Parquet/gw_weather/year=2026/week=28/gw_weather_2026w28.parquet"
+      },
+      "schema": {
+        "parquet": {
+          "notes": "Meteostat-shaped ground observations so it joins GDA's weather cell world. Cols: time(datetime UTC - note 'time', not ts_utc), node_id, ts_source, temp(C), rhum(%), wspd(km/h), wdir(deg met 'from'), pres(hPa), prcp(mm), solar_radiation_w_m2(W/m2), uv(index - net-new vs GDA), device_type, loc_tier, loc_ref, cell_id(0.25deg grid, e.g. cell_51.375_-2.625; derived server-side). Plus provenance year/week/database. Complements ERA5/openmeteo reanalysis as denser real-world point obs; enables the currently-missing temperature<->demand link."
+        }
+      }
+    }
+  ]
+}

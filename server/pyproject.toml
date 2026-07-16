@@ -1,0 +1,31 @@
+[project]
+name = "gridwitness-server"
+version = "0.1.0"
+description = "GridWitness standalone ingest server — receives crowd grid measurements, writes CSV staging."
+readme = "deploy/README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+dependencies = [
+    "fastapi>=0.110",
+    "uvicorn[standard]>=0.29",
+    "pydantic>=2.6",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "httpx>=0.27",          # FastAPI TestClient
+]
+
+[project.scripts]
+gridwitness-server = "gridwitness_server.main:run"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["gridwitness_server*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

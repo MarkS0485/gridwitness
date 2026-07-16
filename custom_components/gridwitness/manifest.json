@@ -1,0 +1,13 @@
+{
+  "domain": "gridwitness",
+  "name": "GridWitness",
+  "version": "0.1.0",
+  "documentation": "https://github.com/gridwitness/gridwitness",
+  "issue_tracker": "https://github.com/gridwitness/gridwitness/issues",
+  "codeowners": [],
+  "config_flow": true,
+  "integration_type": "hub",
+  "iot_class": "cloud_push",
+  "dependencies": [],
+  "requirements": []
+}

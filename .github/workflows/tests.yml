@@ -1,0 +1,35 @@
+name: tests
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  server-and-pure:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install server deps
+        run: pip install -e server[dev] pandas pyarrow
+      - name: Server tests
+        working-directory: server
+        run: python -m pytest -q
+      - name: Pure HA-side unit tests (no HA harness)
+        run: python -m pytest tests/unit -q
+      - name: End-to-end loop (server → CSV → acquirer → parquet)
+        run: python -m pytest tests/integration -q
+
+  ha-component:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install HA test harness
+        run: pip install pytest-homeassistant-custom-component
+      - name: Component tests (config flow, discovery)
+        run: python -m pytest tests/component -q

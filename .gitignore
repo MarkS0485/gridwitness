@@ -1,0 +1,29 @@
+# Secrets & private data — MUST never be committed
+server/**/config.json
+server/**/*.token
+server/**/*.mmdb
+server/server_data/          # SQLite private DB + CSV staging live here
+gda_acquirer/config.json
+*.env
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# HA test artifacts
+.storage/
+tests/**/.storage/
+
+# OS
+.DS_Store
+Thumbs.db

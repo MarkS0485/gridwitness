@@ -1,0 +1,4 @@
+{
+  "_comment": "Copy to config.json (gitignored). staging_dir is the ingest server's CSV staging root.",
+  "staging_dir": "D:/Work/GridWitness/server/server_data/staging"
+}

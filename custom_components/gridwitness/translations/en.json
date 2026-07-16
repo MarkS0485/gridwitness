@@ -1,0 +1,75 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "GridWitness server",
+        "description": "Where should this node send its measurements? Use the address of the GridWitness ingest server. During local testing you can allow an insecure (self-signed or plain-http) connection on your LAN — turn this off before sending data over the internet.",
+        "data": {
+          "server_url": "Ingest server URL",
+          "allow_insecure": "Allow insecure connection (LAN testing only)"
+        }
+      },
+      "consent": {
+        "title": "What you'd like to share",
+        "description": "We ask for the least revealing useful thing and let you choose the rest. Found on this system: {discovered}.\n\n• Grid frequency — the same number for everyone on the GB grid; it says nothing about your home. This is the useful default.\n• Voltage — a reading about your local feeder, not you. Low sensitivity.\n• Current / power — honestly, this reveals a lot: when you're home, asleep, cooking, charging. Share it only if you're happy to; it lets your node self-calibrate the local grid. Never bundled — it's your explicit choice.\n• Weather — outdoor conditions; helps model demand and renewable generation. Low sensitivity.\n\nYou can change or withdraw any of this at any time.",
+        "data": {
+          "share_frequency": "Share grid frequency (recommended)",
+          "share_voltage": "Share voltage",
+          "share_current_power": "Share current / power (reveals household load)",
+          "share_weather": "Share weather-station data",
+          "loc_tier": "Location precision"
+        },
+        "data_description": {
+          "loc_tier": "anon = rough region only (no address) · region = you pick your grid region · data_share = enter a postcode so we can place you more precisely (your postcode never leaves the server; only a grid-area code is ever attached to data)."
+        }
+      },
+      "region": {
+        "title": "Your grid region",
+        "data": { "region": "Region" }
+      },
+      "postcode": {
+        "title": "Your postcode",
+        "description": "Used once, on the server, to derive your grid supply area. It is never published and never leaves the server — only a grid supply point / substation area code is attached to your data. We cannot and do not pin your data to your street.",
+        "data": { "postcode": "Postcode" }
+      }
+    },
+    "error": {
+      "cannot_connect": "Couldn't reach the ingest server: {error}"
+    },
+    "abort": {
+      "already_configured": "This node is already set up."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "GridWitness consent",
+        "description": "Change what you share, or remove your data entirely. Changes take effect immediately — the server stops accepting anything you turn off.",
+        "data": {
+          "share_frequency": "Share grid frequency",
+          "share_voltage": "Share voltage",
+          "share_current_power": "Share current / power (reveals household load)",
+          "share_weather": "Share weather-station data",
+          "delete_my_data": "Delete my data and remove this node"
+        }
+      }
+    },
+    "abort": {
+      "deleted": "Your node and data have been removed.",
+      "cannot_connect": "Couldn't reach the ingest server to apply the change."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "node_frequency": { "name": "Node frequency" },
+      "clock_offset_ms": { "name": "Transport clock offset" },
+      "ntp_offset_ms": { "name": "NTP clock offset" },
+      "samples_today": { "name": "Samples contributed today" },
+      "samples_total": { "name": "Samples contributed total" },
+      "buffer_backlog": { "name": "Unsent buffer backlog" }
+    },
+    "binary_sensor": {
+      "online": { "name": "Server link" }
+    }
+  }
+}

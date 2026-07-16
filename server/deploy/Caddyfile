@@ -1,0 +1,8 @@
+# GridWitness ingest server, fronted by Caddy with automatic Let's Encrypt TLS.
+# Point an A record for ingest.twinscrollgridbalancer.co.uk at the fixed IP, forward 80 and 443
+# to this box, then run `caddy run` (or install Caddy as a service). Caddy fetches and auto-renews
+# the certificate. uvicorn stays bound to localhost; Caddy terminates TLS and proxies to it.
+
+ingest.twinscrollgridbalancer.co.uk {
+	reverse_proxy 127.0.0.1:8000
+}
