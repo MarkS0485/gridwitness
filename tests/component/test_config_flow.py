@@ -29,12 +29,14 @@ def _patched_api(register_return):
 
 @contextmanager
 def _patched_flow(register_return):
-    """Patch discovery, the API client, and the aiohttp session (no real sockets/threads)."""
+    """Patch the flow's collaborators, and stub async_setup_entry so creating the entry does not run
+    real setup (which would start the coordinator's NTP task and touch a socket)."""
     with patch("custom_components.gridwitness.config_flow.discover", return_value=_FAKE_DISCO), \
          patch("custom_components.gridwitness.config_flow.async_get_clientsession",
                return_value=MagicMock()), \
          patch("custom_components.gridwitness.config_flow.ApiClient",
-               return_value=_patched_api(register_return)):
+               return_value=_patched_api(register_return)), \
+         patch("custom_components.gridwitness.async_setup_entry", return_value=True):
         yield
 
 
