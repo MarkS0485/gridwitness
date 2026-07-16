@@ -162,36 +162,48 @@ class GridWitnessConfigFlow(ConfigFlow, domain=DOMAIN):
 
 
 class GridWitnessOptionsFlow(OptionsFlow):
-    """Revocable consent + a delete-my-data action."""
+    """The settings panel: change what you share, your location tier / postcode, or delete your data.
+
+    A menu splits the two concerns so the destructive action can't be hit by accident:
+      init -> menu -> {sharing, delete}
+      sharing -> (channels + location tier) -> region | postcode -> apply
+      delete  -> confirm -> erase
+    """
 
     def __init__(self, entry: ConfigEntry) -> None:
         self.entry = entry
+        self._pending: dict[str, Any] = {}
+
+    def _current(self) -> dict[str, Any]:
+        return {**self.entry.data, **self.entry.options}
+
+    def _api(self) -> ApiClient:
+        current = self._current()
+        return ApiClient(
+            async_get_clientsession(self.hass),
+            current[CONF_SERVER_URL],
+            allow_insecure=current.get(CONF_ALLOW_INSECURE, False),
+        )
 
     async def async_step_init(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
-        current = {**self.entry.data, **self.entry.options}
+        return self.async_show_menu(step_id="init", menu_options=["sharing", "delete"])
+
+    # --- sharing + location -----------------------------------------------------------------------
+
+    async def async_step_sharing(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
+        current = self._current()
         current_channels = set(current.get(CONF_CHANNELS, []))
 
         if user_input is not None:
-            if user_input.get("delete_my_data"):
-                return await self._async_delete()
             enabled = [g for g in CONSENT_GROUPS if user_input.get(f"share_{g}")]
-            channels = _channels_from_groups(enabled) or ["frequency_hz"]
-            # push the consent change to the server (server is the enforcement point)
-            api = ApiClient(
-                async_get_clientsession(self.hass),
-                current[CONF_SERVER_URL],
-                allow_insecure=current.get(CONF_ALLOW_INSECURE, False),
-            )
-            try:
-                await api.update_consent(
-                    current[CONF_NODE_ID], current[CONF_TOKEN], {"channels": channels}
-                )
-            except GridWitnessApiError as err:
-                return self.async_abort(reason="cannot_connect")
-            mapping = {ch: e for ch, e in current.get(CONF_MAPPING, {}).items() if ch in channels}
-            return self.async_create_entry(
-                title="", data={CONF_CHANNELS: channels, CONF_MAPPING: mapping}
-            )
+            self._pending["channels"] = _channels_from_groups(enabled) or ["frequency_hz"]
+            tier = user_input[CONF_LOC_TIER]
+            self._pending[CONF_LOC_TIER] = tier
+            if tier == LOC_REGION:
+                return await self.async_step_region()
+            if tier == LOC_DATA_SHARE:
+                return await self.async_step_postcode()
+            return await self._apply()
 
         def _group_on(grp: str) -> bool:
             return bool(set(CONSENT_GROUPS[grp]["channels"]) & current_channels)
@@ -199,18 +211,71 @@ class GridWitnessOptionsFlow(OptionsFlow):
         schema_dict: dict[Any, Any] = {
             vol.Optional(f"share_{g}", default=_group_on(g)): bool for g in CONSENT_GROUPS
         }
-        schema_dict[vol.Optional("delete_my_data", default=False)] = bool
-        return self.async_show_form(step_id="init", data_schema=vol.Schema(schema_dict))
+        schema_dict[vol.Required(CONF_LOC_TIER,
+                                 default=current.get(CONF_LOC_TIER, LOC_ANON))] = vol.In(list(LOC_TIERS))
+        return self.async_show_form(
+            step_id="sharing",
+            data_schema=vol.Schema(schema_dict),
+            description_placeholders={"loc_ref": current.get(CONF_LOC_REF) or "not set (anonymous)"},
+        )
+
+    async def async_step_region(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
+        if user_input is not None:
+            self._pending[CONF_REGION] = user_input[CONF_REGION]
+            return await self._apply()
+        return self.async_show_form(
+            step_id="region", data_schema=vol.Schema({vol.Required(CONF_REGION): vol.In(list(REGIONS))})
+        )
+
+    async def async_step_postcode(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
+        if user_input is not None:
+            self._pending[CONF_POSTCODE] = user_input[CONF_POSTCODE].strip()
+            return await self._apply()
+        # We never store the postcode locally, so there is nothing to pre-fill; the user re-enters it.
+        return self.async_show_form(
+            step_id="postcode", data_schema=vol.Schema({vol.Required(CONF_POSTCODE): str})
+        )
+
+    async def _apply(self) -> ConfigFlowResult:
+        current = self._current()
+        channels = self._pending["channels"]
+        update: dict[str, Any] = {"channels": channels, "loc_tier": self._pending[CONF_LOC_TIER]}
+        if CONF_REGION in self._pending:
+            update["region"] = self._pending[CONF_REGION]
+        if CONF_POSTCODE in self._pending:
+            update["postcode"] = self._pending[CONF_POSTCODE]
+        try:
+            resp = await self._api().update_consent(
+                current[CONF_NODE_ID], current[CONF_TOKEN], update
+            )
+        except GridWitnessApiError:
+            return self.async_abort(reason="cannot_connect")
+
+        mapping = {ch: e for ch, e in current.get(CONF_MAPPING, {}).items() if ch in channels}
+        # Persist to options (they overlay entry.data); the update listener reloads the entry so the
+        # coordinator picks up the new channels/mapping and de-consented channels stop immediately.
+        return self.async_create_entry(title="", data={
+            CONF_CHANNELS: channels,
+            CONF_MAPPING: mapping,
+            CONF_LOC_TIER: self._pending[CONF_LOC_TIER],
+            CONF_LOC_REF: resp.get("loc_ref"),
+        })
+
+    # --- delete -----------------------------------------------------------------------------------
+
+    async def async_step_delete(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
+        if user_input is not None:
+            if user_input.get("confirm"):
+                return await self._async_delete()
+            return self.async_abort(reason="delete_cancelled")
+        return self.async_show_form(
+            step_id="delete", data_schema=vol.Schema({vol.Required("confirm", default=False): bool})
+        )
 
     async def _async_delete(self) -> ConfigFlowResult:
-        current = {**self.entry.data, **self.entry.options}
-        api = ApiClient(
-            async_get_clientsession(self.hass),
-            current[CONF_SERVER_URL],
-            allow_insecure=current.get(CONF_ALLOW_INSECURE, False),
-        )
+        current = self._current()
         try:
-            await api.delete_node(current[CONF_NODE_ID], current[CONF_TOKEN])
+            await self._api().delete_node(current[CONF_NODE_ID], current[CONF_TOKEN])
         except GridWitnessApiError:
             _LOGGER.warning("Server erasure call failed; removing local entry regardless")
         await self.hass.config_entries.async_remove(self.entry.entry_id)

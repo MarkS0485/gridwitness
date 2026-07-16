@@ -43,19 +43,42 @@
   "options": {
     "step": {
       "init": {
-        "title": "GridWitness consent",
-        "description": "Change what you share, or remove your data entirely. Changes take effect immediately — the server stops accepting anything you turn off.",
+        "title": "GridWitness settings",
+        "description": "Manage what you share and where you are, or remove your data.",
+        "menu_options": {
+          "sharing": "Sharing & location",
+          "delete": "Delete my data"
+        }
+      },
+      "sharing": {
+        "title": "Sharing & location",
+        "description": "Choose what you share and how precisely you're located. Changes take effect immediately: the server stops accepting anything you turn off. Your current area is: {loc_ref}.\n\nGrid frequency reveals nothing about your home. Current / power reveals household load, so share it only if you're happy to. Location: anon = rough region only, region = you pick your grid area, data-share = enter a postcode (kept server-side, never published).",
         "data": {
           "share_frequency": "Share grid frequency",
           "share_voltage": "Share voltage",
           "share_current_power": "Share current / power (reveals household load)",
           "share_weather": "Share weather-station data",
-          "delete_my_data": "Delete my data and remove this node"
+          "loc_tier": "Location precision"
         }
+      },
+      "region": {
+        "title": "Your grid region",
+        "data": { "region": "Region" }
+      },
+      "postcode": {
+        "title": "Your postcode",
+        "description": "Used once on the server to derive your grid area. It is never published and never leaves the server. We cannot pin your data to your street.",
+        "data": { "postcode": "Postcode" }
+      },
+      "delete": {
+        "title": "Delete my data",
+        "description": "This removes your node from the server and marks your contributed data for removal from the research lake. This cannot be undone.",
+        "data": { "confirm": "Yes, delete my node and data" }
       }
     },
     "abort": {
       "deleted": "Your node and data have been removed.",
+      "delete_cancelled": "Nothing was deleted.",
       "cannot_connect": "Couldn't reach the ingest server to apply the change."
     }
   },
