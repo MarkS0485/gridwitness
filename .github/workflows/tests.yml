@@ -32,4 +32,8 @@ jobs:
       - name: Install HA test harness
         run: pip install pytest-homeassistant-custom-component
       - name: Component tests (config flow, discovery)
-        run: python -m pytest tests/component -q
+        # asyncio_mode=auto lets pytest-asyncio resolve the harness's async `hass` fixture.
+        run: >
+          python -m pytest tests/component -q
+          -o asyncio_mode=auto
+          -o asyncio_default_fixture_loop_scope=function
