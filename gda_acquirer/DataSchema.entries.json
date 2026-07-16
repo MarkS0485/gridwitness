@@ -1,10 +1,10 @@
 {
-  "_comment": "Append these two objects to the `datasets` array in D:\\Work\\GDA\\v1\\DataSchema.json (schemaVersion 3.0.0). Do NOT paste this wrapper object — only the two entries below.",
+  "_comment": "Append these two objects to the `datasets` array in D:\\Work\\GDA\\v1\\DataSchema.json (schemaVersion 3.0.0). Do NOT paste this wrapper object, only the two entries below.",
   "entries": [
     {
       "id": "GridWitness/gw_electrical",
       "displayName": "GridWitness crowd electrical (frequency/voltage/current/power, HA nodes)",
-      "source": { "provider": "GridWitness", "url": "https://github.com/gridwitness/gridwitness" },
+      "source": { "provider": "GridWitness", "url": "https://github.com/MarkS0485/gridwitness" },
       "storage": {
         "parquetPath": "DataSources/GridWitness/Parquet/gw_electrical",
         "format": "parquet",
@@ -21,7 +21,7 @@
     {
       "id": "GridWitness/gw_weather",
       "displayName": "GridWitness crowd weather stations (HA nodes, Meteostat-shaped)",
-      "source": { "provider": "GridWitness", "url": "https://github.com/gridwitness/gridwitness" },
+      "source": { "provider": "GridWitness", "url": "https://github.com/MarkS0485/gridwitness" },
       "storage": {
         "parquetPath": "DataSources/GridWitness/Parquet/gw_weather",
         "format": "parquet",
