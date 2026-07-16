@@ -1,7 +1,8 @@
 """Config + options flow. Needs the HA test harness (pytest-homeassistant-custom-component)."""
 from __future__ import annotations
 
-from unittest.mock import AsyncMock, patch
+from contextlib import contextmanager
+from unittest.mock import AsyncMock, MagicMock, patch
 
 from homeassistant import config_entries
 from homeassistant.data_entry_flow import FlowResultType
@@ -26,10 +27,19 @@ def _patched_api(register_return):
     return api
 
 
-async def test_user_flow_frequency_anon(hass):
+@contextmanager
+def _patched_flow(register_return):
+    """Patch discovery, the API client, and the aiohttp session (no real sockets/threads)."""
     with patch("custom_components.gridwitness.config_flow.discover", return_value=_FAKE_DISCO), \
+         patch("custom_components.gridwitness.config_flow.async_get_clientsession",
+               return_value=MagicMock()), \
          patch("custom_components.gridwitness.config_flow.ApiClient",
-               return_value=_patched_api({"node_id": "abcd1234ef", "token": "tok", "loc_ref": None})):
+               return_value=_patched_api(register_return)):
+        yield
+
+
+async def test_user_flow_frequency_anon(hass):
+    with _patched_flow({"node_id": "abcd1234ef", "token": "tok", "loc_ref": None}):
         result = await hass.config_entries.flow.async_init(
             DOMAIN, context={"source": config_entries.SOURCE_USER}
         )
@@ -50,10 +60,7 @@ async def test_user_flow_frequency_anon(hass):
 
 
 async def test_data_share_asks_for_postcode(hass):
-    with patch("custom_components.gridwitness.config_flow.discover", return_value=_FAKE_DISCO), \
-         patch("custom_components.gridwitness.config_flow.ApiClient",
-               return_value=_patched_api(
-                   {"node_id": "n2", "token": "t2", "loc_ref": "GSP_SOUTH_WEST"})):
+    with _patched_flow({"node_id": "n2", "token": "t2", "loc_ref": "GSP_SOUTH_WEST"}):
         result = await hass.config_entries.flow.async_init(
             DOMAIN, context={"source": config_entries.SOURCE_USER}
         )
