@@ -11,20 +11,58 @@ from typing import Literal
 
 from pydantic import BaseModel, Field, field_validator
 
-# --- Channel catalogue ----------------------------------------------------------------------------
+# --- Channel catalogue (single source of truth for the published schema) ---------------------------
+#
+# One authoritative list of every channel a submitter may send: its kind (which row it lives on),
+# unit, JSON type, sensitivity, and a one-line meaning. The frozensets below are derived from this,
+# and the schema exporter publishes it as schema/channels.v1.json so third parties can code to it.
+SCHEMA_VERSION = "1.0"
 
-# Electrical channels (values live on ElectricalRow).
+CHANNEL_CATALOGUE: dict[str, dict[str, str]] = {
+    # electrical
+    "frequency_hz": {"kind": "electrical", "unit": "Hz", "type": "number", "sensitivity": "none",
+                     "description": "System frequency, node-global (~49-51 Hz on GB)."},
+    "voltage_v": {"kind": "electrical", "unit": "V", "type": "number", "sensitivity": "low",
+                  "description": "RMS voltage. A property of your local feeder, not you."},
+    "current_a": {"kind": "electrical", "unit": "A", "type": "number", "sensitivity": "high",
+                  "description": "RMS current. Reveals household load; opt-in only."},
+    "power_w": {"kind": "electrical", "unit": "W", "type": "number", "sensitivity": "high",
+                "description": "Real power. Reveals household load; opt-in only."},
+    "power_factor": {"kind": "electrical", "unit": "", "type": "number", "sensitivity": "high",
+                     "description": "Power factor (-1..1). Reveals load character; opt-in only."},
+    "phase_angle_deg": {"kind": "electrical", "unit": "deg", "type": "number", "sensitivity": "low",
+                        "description": "Synchrophasor angle vs UTC (GPS/PMU nodes only)."},
+    # weather (Meteostat-shaped so it joins the GDA weather cell grid downstream)
+    "temp": {"kind": "weather", "unit": "degC", "type": "number", "sensitivity": "low",
+             "description": "Ambient outdoor temperature."},
+    "rhum": {"kind": "weather", "unit": "%", "type": "number", "sensitivity": "low",
+             "description": "Relative humidity."},
+    "wspd": {"kind": "weather", "unit": "km/h", "type": "number", "sensitivity": "low",
+             "description": "Wind speed (note measurement height)."},
+    "wdir": {"kind": "weather", "unit": "deg", "type": "number", "sensitivity": "low",
+             "description": "Wind direction, meteorological 'from' (0=N, 90=E)."},
+    "pres": {"kind": "weather", "unit": "hPa", "type": "number", "sensitivity": "low",
+             "description": "Atmospheric pressure."},
+    "prcp": {"kind": "weather", "unit": "mm", "type": "number", "sensitivity": "low",
+             "description": "Rainfall."},
+    "solar_radiation_w_m2": {"kind": "weather", "unit": "W/m2", "type": "number", "sensitivity": "low",
+                             "description": "Shortwave irradiance."},
+    "uv": {"kind": "weather", "unit": "index", "type": "number", "sensitivity": "low",
+           "description": "UV index."},
+}
+
 ELECTRICAL_CHANNELS: frozenset[str] = frozenset(
-    {"frequency_hz", "voltage_v", "current_a", "power_w", "power_factor", "phase_angle_deg"}
+    k for k, v in CHANNEL_CATALOGUE.items() if v["kind"] == "electrical"
 )
-# Weather channels (values live on WeatherRow).
 WEATHER_CHANNELS: frozenset[str] = frozenset(
-    {"temp", "rhum", "wspd", "wdir", "pres", "prcp", "solar_radiation_w_m2", "uv"}
+    k for k, v in CHANNEL_CATALOGUE.items() if v["kind"] == "weather"
 )
 ALL_CHANNELS: frozenset[str] = ELECTRICAL_CHANNELS | WEATHER_CHANNELS
 
 # Household-sensitive channels — the ones that reveal load/behaviour. Used for extra logging/guards.
-HIGH_SENSITIVITY_CHANNELS: frozenset[str] = frozenset({"current_a", "power_w", "power_factor"})
+HIGH_SENSITIVITY_CHANNELS: frozenset[str] = frozenset(
+    k for k, v in CHANNEL_CATALOGUE.items() if v["sensitivity"] == "high"
+)
 
 
 class LocTier(str, Enum):
@@ -88,6 +126,10 @@ class RegisterRequest(BaseModel):
     device_type: str = "unknown"
     firmware: str | None = None
     cadence_ms: int | None = None
+    # Who is submitting: the client software name/version, e.g. "gridwitness-ha/0.1.0" or
+    # "acme-energy-app/2.3". Third-party submitters should set this; stored server-side for provenance.
+    producer: str | None = None
+    schema_version: str = SCHEMA_VERSION
 
     @field_validator("channels")
     @classmethod
@@ -108,6 +150,7 @@ class RegisterResponse(BaseModel):
 class SamplesRequest(BaseModel):
     node_id: str
     client_send_ts: str | None = None
+    schema_version: str = SCHEMA_VERSION
     electrical: list[ElectricalRow] = Field(default_factory=list)
     weather: list[WeatherRow] = Field(default_factory=list)
 

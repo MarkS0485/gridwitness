@@ -1,0 +1,106 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/MarkS0485/gridwitness/main/schema/channels.v1.json",
+  "title": "GridWitness channel catalogue v1",
+  "gridwitnessSchemaVersion": "1.0",
+  "channels": {
+    "frequency_hz": {
+      "kind": "electrical",
+      "unit": "Hz",
+      "type": "number",
+      "sensitivity": "none",
+      "description": "System frequency, node-global (~49-51 Hz on GB)."
+    },
+    "voltage_v": {
+      "kind": "electrical",
+      "unit": "V",
+      "type": "number",
+      "sensitivity": "low",
+      "description": "RMS voltage. A property of your local feeder, not you."
+    },
+    "current_a": {
+      "kind": "electrical",
+      "unit": "A",
+      "type": "number",
+      "sensitivity": "high",
+      "description": "RMS current. Reveals household load; opt-in only."
+    },
+    "power_w": {
+      "kind": "electrical",
+      "unit": "W",
+      "type": "number",
+      "sensitivity": "high",
+      "description": "Real power. Reveals household load; opt-in only."
+    },
+    "power_factor": {
+      "kind": "electrical",
+      "unit": "",
+      "type": "number",
+      "sensitivity": "high",
+      "description": "Power factor (-1..1). Reveals load character; opt-in only."
+    },
+    "phase_angle_deg": {
+      "kind": "electrical",
+      "unit": "deg",
+      "type": "number",
+      "sensitivity": "low",
+      "description": "Synchrophasor angle vs UTC (GPS/PMU nodes only)."
+    },
+    "temp": {
+      "kind": "weather",
+      "unit": "degC",
+      "type": "number",
+      "sensitivity": "low",
+      "description": "Ambient outdoor temperature."
+    },
+    "rhum": {
+      "kind": "weather",
+      "unit": "%",
+      "type": "number",
+      "sensitivity": "low",
+      "description": "Relative humidity."
+    },
+    "wspd": {
+      "kind": "weather",
+      "unit": "km/h",
+      "type": "number",
+      "sensitivity": "low",
+      "description": "Wind speed (note measurement height)."
+    },
+    "wdir": {
+      "kind": "weather",
+      "unit": "deg",
+      "type": "number",
+      "sensitivity": "low",
+      "description": "Wind direction, meteorological 'from' (0=N, 90=E)."
+    },
+    "pres": {
+      "kind": "weather",
+      "unit": "hPa",
+      "type": "number",
+      "sensitivity": "low",
+      "description": "Atmospheric pressure."
+    },
+    "prcp": {
+      "kind": "weather",
+      "unit": "mm",
+      "type": "number",
+      "sensitivity": "low",
+      "description": "Rainfall."
+    },
+    "solar_radiation_w_m2": {
+      "kind": "weather",
+      "unit": "W/m2",
+      "type": "number",
+      "sensitivity": "low",
+      "description": "Shortwave irradiance."
+    },
+    "uv": {
+      "kind": "weather",
+      "unit": "index",
+      "type": "number",
+      "sensitivity": "low",
+      "description": "UV index."
+    }
+  }
+}

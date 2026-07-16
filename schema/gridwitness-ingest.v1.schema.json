@@ -1,0 +1,472 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/MarkS0485/gridwitness/main/schema/gridwitness-ingest.v1.schema.json",
+  "title": "GridWitness ingest v1",
+  "description": "Request/response payloads for the GridWitness ingest API. See docs/submitters.md for how to build your own submitter.",
+  "gridwitnessSchemaVersion": "1.0",
+  "$defs": {
+    "ElectricalRow": {
+      "properties": {
+        "ts_utc": {
+          "title": "Ts Utc",
+          "type": "string"
+        },
+        "ts_source": {
+          "default": "ha_receive",
+          "enum": [
+            "device",
+            "ha_receive",
+            "gps"
+          ],
+          "title": "Ts Source",
+          "type": "string"
+        },
+        "phase": {
+          "default": "1p",
+          "enum": [
+            "L1",
+            "L2",
+            "L3",
+            "1p"
+          ],
+          "title": "Phase",
+          "type": "string"
+        },
+        "voltage_v": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Voltage V"
+        },
+        "current_a": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Current A"
+        },
+        "power_w": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Power W"
+        },
+        "power_factor": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Power Factor"
+        },
+        "frequency_hz": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Frequency Hz"
+        },
+        "phase_angle_deg": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Phase Angle Deg"
+        }
+      },
+      "required": [
+        "ts_utc"
+      ],
+      "title": "ElectricalRow",
+      "type": "object"
+    },
+    "LocTier": {
+      "enum": [
+        "anon",
+        "region",
+        "data_share"
+      ],
+      "title": "LocTier",
+      "type": "string"
+    },
+    "RegisterRequest": {
+      "properties": {
+        "channels": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Channels",
+          "type": "array"
+        },
+        "loc_tier": {
+          "$ref": "#/$defs/LocTier",
+          "default": "anon"
+        },
+        "region": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Region"
+        },
+        "postcode": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Postcode"
+        },
+        "device_type": {
+          "default": "unknown",
+          "title": "Device Type",
+          "type": "string"
+        },
+        "firmware": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Firmware"
+        },
+        "cadence_ms": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Cadence Ms"
+        },
+        "producer": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Producer"
+        },
+        "schema_version": {
+          "default": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        }
+      },
+      "title": "RegisterRequest",
+      "type": "object"
+    },
+    "RegisterResponse": {
+      "properties": {
+        "node_id": {
+          "title": "Node Id",
+          "type": "string"
+        },
+        "token": {
+          "title": "Token",
+          "type": "string"
+        },
+        "loc_ref": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Loc Ref"
+        },
+        "cell_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Cell Id"
+        }
+      },
+      "required": [
+        "node_id",
+        "token",
+        "loc_ref",
+        "cell_id"
+      ],
+      "title": "RegisterResponse",
+      "type": "object"
+    },
+    "RejectedRow": {
+      "properties": {
+        "index": {
+          "title": "Index",
+          "type": "integer"
+        },
+        "kind": {
+          "enum": [
+            "electrical",
+            "weather"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "reason": {
+          "title": "Reason",
+          "type": "string"
+        }
+      },
+      "required": [
+        "index",
+        "kind",
+        "reason"
+      ],
+      "title": "RejectedRow",
+      "type": "object"
+    },
+    "SamplesRequest": {
+      "properties": {
+        "node_id": {
+          "title": "Node Id",
+          "type": "string"
+        },
+        "client_send_ts": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Client Send Ts"
+        },
+        "schema_version": {
+          "default": "1.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "electrical": {
+          "items": {
+            "$ref": "#/$defs/ElectricalRow"
+          },
+          "title": "Electrical",
+          "type": "array"
+        },
+        "weather": {
+          "items": {
+            "$ref": "#/$defs/WeatherRow"
+          },
+          "title": "Weather",
+          "type": "array"
+        }
+      },
+      "required": [
+        "node_id"
+      ],
+      "title": "SamplesRequest",
+      "type": "object"
+    },
+    "SamplesResponse": {
+      "properties": {
+        "server_receive_ts": {
+          "title": "Server Receive Ts",
+          "type": "string"
+        },
+        "accepted": {
+          "title": "Accepted",
+          "type": "integer"
+        },
+        "duplicates": {
+          "title": "Duplicates",
+          "type": "integer"
+        },
+        "rejected": {
+          "items": {
+            "$ref": "#/$defs/RejectedRow"
+          },
+          "title": "Rejected",
+          "type": "array"
+        }
+      },
+      "required": [
+        "server_receive_ts",
+        "accepted",
+        "duplicates"
+      ],
+      "title": "SamplesResponse",
+      "type": "object"
+    },
+    "WeatherRow": {
+      "properties": {
+        "time": {
+          "title": "Time",
+          "type": "string"
+        },
+        "ts_source": {
+          "default": "ha_receive",
+          "enum": [
+            "device",
+            "ha_receive"
+          ],
+          "title": "Ts Source",
+          "type": "string"
+        },
+        "temp": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Temp"
+        },
+        "rhum": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Rhum"
+        },
+        "wspd": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Wspd"
+        },
+        "wdir": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Wdir"
+        },
+        "pres": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Pres"
+        },
+        "prcp": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Prcp"
+        },
+        "solar_radiation_w_m2": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Solar Radiation W M2"
+        },
+        "uv": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Uv"
+        }
+      },
+      "required": [
+        "time"
+      ],
+      "title": "WeatherRow",
+      "type": "object"
+    }
+  }
+}

@@ -11,8 +11,15 @@ North star: breadth the professional networks don't have. Four professional PMUs
 | `custom_components/gridwitness/` | The Home Assistant custom integration (HACS). The primary deliverable. |
 | `server/` | A standalone Python ingest server (FastAPI) you self-host. It receives data and writes CSV. |
 | `gda_acquirer/` | The GDA lake acquirer, designed here and deployed into the GDA repo later. |
-| `docs/` | The contracts: [data model](docs/data-model.md), [ingest API](docs/ingest-api.md), [privacy](docs/privacy-statement.md), [architecture](docs/architecture.md). |
+| `schema/` | The published, versioned ingest schema (JSON Schema, channel catalogue, OpenAPI). Code your own submitter against these. |
+| `docs/` | The contracts: [data model](docs/data-model.md), [ingest API](docs/ingest-api.md), [submitter guide](docs/submitters.md), [privacy](docs/privacy-statement.md), [architecture](docs/architecture.md). |
 | `DESIGN.md` | The full project design. |
+
+## Bring your own data
+
+GridWitness is not tied to Home Assistant. If you have grid or weather data, or an app that produces
+it, you can submit directly against a published, versioned schema. Start with the
+[submitter guide](docs/submitters.md) and the machine-readable contract in [`schema/`](schema/).
 
 ## How it fits together
 

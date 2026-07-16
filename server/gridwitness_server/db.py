@@ -27,6 +27,7 @@ CREATE TABLE IF NOT EXISTS nodes (
     loc_ref      TEXT,
     cell_id      TEXT,
     channels     TEXT NOT NULL,          -- JSON array of consented channel names
+    producer     TEXT,                   -- submitting client software, e.g. "acme-energy-app/2.3"
     deleted_utc  TEXT                    -- NULL unless erased
 );
 CREATE TABLE IF NOT EXISTS tokens (
@@ -60,7 +61,14 @@ class Database:
         self._conn.execute("PRAGMA journal_mode=WAL")
         with self._lock:
             self._conn.executescript(_SCHEMA)
+            self._migrate()
             self._conn.commit()
+
+    def _migrate(self) -> None:
+        """Add columns introduced after a DB was first created (idempotent)."""
+        cols = {r["name"] for r in self._conn.execute("PRAGMA table_info(nodes)")}
+        if "producer" not in cols:
+            self._conn.execute("ALTER TABLE nodes ADD COLUMN producer TEXT")
 
     def close(self) -> None:
         with self._lock:
@@ -82,14 +90,15 @@ class Database:
         channels: list[str],
         postcode: str | None,
         raw_region: str | None,
+        producer: str | None = None,
     ) -> None:
         with self._lock:
             self._conn.execute(
                 "INSERT INTO nodes(node_id, created_utc, device_type, firmware, cadence_ms, "
-                "loc_tier, loc_ref, cell_id, channels, deleted_utc) "
-                "VALUES (?,?,?,?,?,?,?,?,?,NULL)",
+                "loc_tier, loc_ref, cell_id, channels, producer, deleted_utc) "
+                "VALUES (?,?,?,?,?,?,?,?,?,?,NULL)",
                 (node_id, _now(), device_type, firmware, cadence_ms, loc_tier, loc_ref,
-                 cell_id, json.dumps(sorted(channels))),
+                 cell_id, json.dumps(sorted(channels)), producer),
             )
             self._conn.execute(
                 "INSERT INTO tokens(node_id, token_sha256) VALUES (?,?)", (node_id, token_sha256)

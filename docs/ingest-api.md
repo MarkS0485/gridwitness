@@ -1,7 +1,12 @@
 # GridWitness ingest API (v1)
 
-The HTTP contract between the Home Assistant client and the standalone ingest server. Versioned under
-`/v1`. All bodies are JSON. All timestamps are UTC ISO-8601 with `Z`.
+The HTTP contract between any client and the standalone ingest server. Versioned under `/v1`. All
+bodies are JSON. All timestamps are UTC ISO-8601 with `Z`.
+
+> Building your own submitter? The machine-readable contract lives in [`schema/`](../schema/)
+> (JSON Schema + channel catalogue + OpenAPI), and the step-by-step guide is
+> [`submitters.md`](submitters.md). This page is the human-readable companion; the schema files win on
+> any discrepancy.
 
 Base URL: `http(s)://<host>:<port>` — IP-only during testing; `https://<hostname>` before public
 launch (see `server/deploy/README.md`).

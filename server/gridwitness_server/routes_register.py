@@ -44,6 +44,7 @@ def register(body: RegisterRequest, request: Request) -> RegisterResponse:
         channels=body.channels,
         postcode=loc["stored_postcode"],   # private DB only
         raw_region=loc["raw_region"],      # private DB only
+        producer=body.producer,
     )
 
     return RegisterResponse(
