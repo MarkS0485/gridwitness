@@ -20,3 +20,6 @@ jobs:
         uses: hacs/action@main
         with:
           category: integration
+          # 'brands' requires registering the integration in home-assistant/brands, a separate
+          # pre-publish step. Skip it here so CI stays green until that PR lands.
+          ignore: brands
