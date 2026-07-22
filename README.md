@@ -4,6 +4,14 @@ Crowd-sourced GB grid measurement via Home Assistant. Turn the metering hardware
 
 North star: breadth the professional networks don't have. Four professional PMUs cost thousands of pounds. Four hundred amateur nodes cover the whole island.
 
+## Active Providers
+|Location | Type | Sample Rate
+|---|---|---|
+|Essex.Epping|Freq|30Hz|
+|Essex.Orsett|FreqVoltPhaseAng| 15hz|
+|Cambridge.Fens.Ram|All | 50Hz|
+|Newcastle.City|Freq|1Hz|
+
 ## What's in this repo
 
 | Path | What it is |
