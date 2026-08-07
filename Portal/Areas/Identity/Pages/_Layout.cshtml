@@ -1,0 +1,15 @@
+@{
+    Layout = "/Views/Shared/_Layout.cshtml";
+}
+<section class="uk-gradient-hero text-white">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 py-10">
+        <h1 class="text-3xl font-bold">@(ViewData["Title"] ?? "Account")</h1>
+        <p class="text-white/80 mt-1">GridWitness contributor account</p>
+    </div>
+</section>
+<div class="max-w-3xl mx-auto px-4 sm:px-6 py-10">
+    <div class="identity-card identity-pane">
+        @RenderBody()
+    </div>
+</div>
+@await RenderSectionAsync("Scripts", required: false)

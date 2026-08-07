@@ -1,0 +1,77 @@
+@{
+    ViewData["Title"] = "Measure the grid you live on";
+    ViewData["Section"] = "home";
+    ViewData["Description"] = "GridWitness turns the meters Home Assistant users already own into a distributed, UTC-timestamped measurement fabric for the GB grid. Privacy-first and open.";
+}
+
+<!-- Hero -->
+<section class="uk-gradient-hero text-white relative overflow-hidden">
+    <div class="bg-grid-pattern absolute inset-0 opacity-30"></div>
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-20 relative">
+        <div class="max-w-3xl">
+            <span class="inline-block text-xs font-bold tracking-widest bg-white/10 border border-white/20 rounded-full px-3 py-1">CITIZEN-SCIENCE GRID MEASUREMENT</span>
+            <h1 class="text-4xl sm:text-5xl font-extrabold mt-5 leading-tight">Measure the grid you live on.</h1>
+            <p class="text-lg text-white/85 mt-5">
+                GridWitness turns the meters you already own — smart plugs, 3-phase meters, inverters, DIY PMUs — into a
+                distributed, UTC-true measurement fabric for the GB grid. Four professional PMUs cost thousands;
+                four hundred amateur nodes cost nothing and cover the whole island.
+            </p>
+            <div class="mt-8 flex flex-wrap gap-3">
+                <a asp-area="Identity" asp-page="/Account/Register" class="btn-primary"><i class="fa-solid fa-bolt mr-2"></i>Become a contributor</a>
+                <a asp-controller="Home" asp-action="HowItWorks" class="btn-secondary">How it works</a>
+            </div>
+            <p class="mt-4 text-sm text-white/60">Default is anonymous and frequency-only. Every step beyond that is your explicit, revocable choice.</p>
+        </div>
+    </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- Value props -->
+<section class="max-w-6xl mx-auto px-4 sm:px-6 py-14">
+    <div class="grid gap-6 md:grid-cols-3">
+        <div class="card p-6">
+            <div class="card-icon mb-4"><i class="fa-solid fa-wave-square"></i></div>
+            <h3 class="font-bold text-tsgb-navy text-lg">Frequency is global</h3>
+            <p class="text-gray-600 mt-2 text-sm">The grid frequency is the same for everyone at a given instant. Any node can measure it, and on its own it's genuinely useful — with zero information about your household.</p>
+        </div>
+        <div class="card p-6">
+            <div class="card-icon mb-4"><i class="fa-solid fa-location-crosshairs"></i></div>
+            <h3 class="font-bold text-tsgb-navy text-lg">Density nobody else has</h3>
+            <p class="text-gray-600 mt-2 text-sm">We don't replace professional PMUs — we build the thing nobody has: geographic breadth. Many cheap nodes plus a few GPS anchors map the whole network.</p>
+        </div>
+        <div class="card p-6">
+            <div class="card-icon mb-4"><i class="fa-solid fa-user-shield"></i></div>
+            <h3 class="font-bold text-tsgb-navy text-lg">Privacy is the deal</h3>
+            <p class="text-gray-600 mt-2 text-sm">We ask for the least revealing thing that's useful, and never bundle the sensitive channels. Consent is per data-type and location is tiered — always reversible.</p>
+        </div>
+    </div>
+</section>
+
+<!-- How it fits together -->
+<section class="bg-white/50">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-14">
+        <h2 class="text-2xl font-bold text-tsgb-navy text-center">How it fits together</h2>
+        <div class="mt-8 grid gap-4 md:grid-cols-4">
+            @foreach (var (icon, title, body) in new[] {
+                ("fa-house-signal", "1 · Your node", "A Home Assistant integration (or your own uploader) reads the meters you already have."),
+                ("fa-key", "2 · An API key", "Sign up here, pick what to share, and get a key that registers your node."),
+                ("fa-cloud-arrow-up", "3 · Ingest", "Batches stream over HTTPS to ingest.twinscrollgridbalancer.co.uk, UTC-corrected and deduplicated."),
+                ("fa-database", "4 · Research lake", "Anonymised, derived-location data feeds grid research — never your address or token.") })
+            {
+                <div class="glass-panel rounded-lg p-5 text-center">
+                    <div class="card-icon mx-auto mb-3"><i class="fa-solid @icon"></i></div>
+                    <div class="font-bold text-tsgb-navy">@title</div>
+                    <p class="text-sm text-gray-600 mt-1">@body</p>
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+<!-- CTA -->
+<section class="max-w-4xl mx-auto px-4 sm:px-6 py-16 text-center">
+    <h2 class="text-3xl font-bold text-tsgb-navy">Ready to put your meter on the map?</h2>
+    <p class="text-gray-600 mt-3">Create a free account, issue an API key, and start contributing in minutes.</p>
+    <a asp-area="Identity" asp-page="/Account/Register" class="btn-primary mt-6 inline-block"><i class="fa-solid fa-bolt mr-2"></i>Get started</a>
+</section>

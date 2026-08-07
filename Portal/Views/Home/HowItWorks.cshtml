@@ -1,0 +1,78 @@
+@{
+    ViewData["Title"] = "How it works";
+    ViewData["Section"] = "how";
+}
+
+<section class="uk-gradient-hero text-white">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 py-14">
+        <h1 class="text-4xl font-extrabold">How GridWitness works</h1>
+        <p class="text-white/85 mt-3 text-lg">From the meter on your wall to a UTC-coherent map of the GB grid.</p>
+    </div>
+</section>
+
+<div class="max-w-4xl mx-auto px-4 sm:px-6 py-12 space-y-12">
+
+    <!-- Node tiers -->
+    <section>
+        <h2 class="text-2xl font-bold text-tsgb-navy">What kind of node can you be?</h2>
+        <p class="text-gray-600 mt-2">Contribute at whatever level your hardware supports. Even a single frequency node is useful; a handful of GPS-anchored PMUs sync the entire fleet.</p>
+        <div class="mt-6 grid gap-4 md:grid-cols-3">
+            <div class="card p-5">
+                <div class="text-xs font-bold tracking-widest text-tsgb-red">T1 · FREQUENCY</div>
+                <h3 class="font-bold text-tsgb-navy mt-1">Frequency node</h3>
+                <p class="text-sm text-gray-600 mt-2">Any frequency-capable meter (Shelly, Tasmota/ESPHome, some inverters). Gives system frequency at 1–5 s, self-synced against NESO's national trace.</p>
+            </div>
+            <div class="card p-5">
+                <div class="text-xs font-bold tracking-widest text-tsgb-red">T2 · RICH</div>
+                <h3 class="font-bold text-tsgb-navy mt-1">3-phase node</h3>
+                <p class="text-sm text-gray-600 mt-2">Shelly Pro 3EM, Emporia Vue, CT banks, industrial Modbus meters. Per-phase voltage, current, power and power factor — feeder-located if you data-share.</p>
+            </div>
+            <div class="card p-5">
+                <div class="text-xs font-bold tracking-widest text-tsgb-red">T3 · ANCHOR</div>
+                <h3 class="font-bold text-tsgb-navy mt-1">PMU node</h3>
+                <p class="text-sm text-gray-600 mt-2">DIY GPS PMU (OpenPMU / Red Pitaya / Teensy+GPS-PPS). Phase angle versus UTC at sub-microsecond timing — the fleet's absolute reference.</p>
+            </div>
+        </div>
+    </section>
+
+    <div class="section-divider-slim"></div>
+
+    <!-- Privacy tiers -->
+    <section>
+        <h2 class="text-2xl font-bold text-tsgb-navy">Privacy is tiered, and it's yours to set</h2>
+        <p class="text-gray-600 mt-2">Consent is per data-type <em>and</em> location is tiered. The default is anonymous, frequency-only.</p>
+        <div class="mt-6 space-y-3">
+            <div class="kpi-tile">
+                <div class="kpi-label">Anonymous · default</div>
+                <p class="text-gray-700 mt-1">No address. Only a rough region derived from your connection. Fully useful for frequency.</p>
+            </div>
+            <div class="kpi-tile">
+                <div class="kpi-label">Region</div>
+                <p class="text-gray-700 mt-1">You pick your GB region from a list. Better regional mapping, still no address.</p>
+            </div>
+            <div class="kpi-tile">
+                <div class="kpi-label">Data-share</div>
+                <p class="text-gray-700 mt-1">You enter a postcode so we can place readings on the network. The postcode never leaves the server; only a coarse derived area (a grid supply point or primary substation) is attached to your data.</p>
+            </div>
+        </div>
+        <p class="text-sm text-gray-500 mt-4">We're honest about the ceiling: even in data-share mode we pin data to a grid supply point or primary substation — never your individual street cable. <a asp-action="Privacy" class="text-tsgb-red font-semibold">Read the full privacy statement →</a></p>
+    </section>
+
+    <div class="section-divider-slim"></div>
+
+    <!-- Time & sync -->
+    <section>
+        <h2 class="text-2xl font-bold text-tsgb-navy">Made coherent by time</h2>
+        <p class="text-gray-600 mt-2">Cheap sensors don't agree on the clock. GridWitness corrects for that in four stages so the whole fleet lines up:</p>
+        <ol class="mt-4 space-y-3">
+            <li class="flex gap-3"><span class="card-icon !w-8 !h-8 !text-sm flex-shrink-0">1</span><span class="text-gray-700"><strong>Stamp early.</strong> Prefer device/source timestamps, as close to the sensor as possible.</span></li>
+            <li class="flex gap-3"><span class="card-icon !w-8 !h-8 !text-sm flex-shrink-0">2</span><span class="text-gray-700"><strong>Correct transport offset.</strong> The protocol carries client-send and server-receive times for an NTP-style offset estimate.</span></li>
+            <li class="flex gap-3"><span class="card-icon !w-8 !h-8 !text-sm flex-shrink-0">3</span><span class="text-gray-700"><strong>Self-sync against NESO.</strong> Cross-correlate each node's frequency against the national 1 s trace to recover its clock error — no GPS needed.</span></li>
+            <li class="flex gap-3"><span class="card-icon !w-8 !h-8 !text-sm flex-shrink-0">4</span><span class="text-gray-700"><strong>GPS anchors.</strong> T3 PMU nodes carry UTC-true time and become the fleet's absolute references.</span></li>
+        </ol>
+    </section>
+
+    <div class="text-center pt-4">
+        <a asp-area="Identity" asp-page="/Account/Register" class="btn-primary"><i class="fa-solid fa-bolt mr-2"></i>Start contributing</a>
+    </div>
+</div>

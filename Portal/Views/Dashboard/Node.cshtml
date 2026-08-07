@@ -1,0 +1,117 @@
+@model ManageNodeVm
+@{
+    ViewData["Title"] = "Manage node";
+    ViewData["Section"] = "dashboard";
+    var n = Model.Node;
+    var groups = GridWitnessCatalogue.ConsentGroups;
+    var regions = GridWitnessCatalogue.Regions;
+    var locked = !Model.EmailConfirmed;
+}
+
+<section class="uk-gradient-hero text-white">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 py-10">
+        <a asp-action="Index" class="text-white/70 text-sm hover:text-white"><i class="fa-solid fa-arrow-left mr-1"></i> All keys</a>
+        <h1 class="text-3xl font-bold mt-2">@(string.IsNullOrEmpty(n.DeviceType) ? "Node" : n.DeviceType)</h1>
+        <p class="text-white/70 mt-1 font-mono text-sm break-all">@n.NodeId</p>
+    </div>
+</section>
+
+<div class="max-w-3xl mx-auto px-4 sm:px-6 py-8 space-y-6">
+
+    @if (TempData["Message"] is string msg)
+    {
+        <div class="alert alert-success">@msg</div>
+    }
+    @if (TempData["Error"] is string terr)
+    {
+        <div class="alert alert-danger">@terr</div>
+    }
+
+    @if (locked)
+    {
+        <div class="alert alert-warning">
+            <i class="fa-solid fa-lock mt-0.5"></i>
+            <div>
+                <strong>Confirm your email to manage or delete this node.</strong>
+                Changing what a node shares and erasing data both require a confirmed email — it's how we prove the account is yours before acting on your data (GDPR).
+                <a asp-area="Identity" asp-page="/Account/ResendEmailConfirmation" class="font-semibold underline">Resend confirmation email</a>.
+            </div>
+        </div>
+    }
+
+    <!-- Alter consent / location -->
+    <form asp-action="UpdateNode" asp-route-id="@n.NodeId" method="post" class="glass-panel rounded-lg p-6 space-y-5">
+        <h2 class="text-lg font-bold text-tsgb-navy">What this node shares</h2>
+        <fieldset @(locked ? "disabled" : null) class="space-y-2">
+            @foreach (var g in groups)
+            {
+                var isChecked = Model.Groups.Contains(g.Key);
+                <label class="flex items-start gap-3 p-3 rounded-lg border border-gray-200">
+                    <input type="checkbox" name="Groups" value="@g.Key" checked="@(isChecked ? "checked" : null)" class="mt-1" style="accent-color:#C8102E;width:1rem;height:1rem;" />
+                    <span>
+                        <span class="font-semibold text-tsgb-navy">@g.Title</span>
+                        @if (g.Sensitivity == "high")
+                        {
+                            <span class="ml-2 text-xs px-2 py-0.5 rounded-full bg-red-100 text-red-700">reveals load</span>
+                        }
+                        <span class="block text-sm text-gray-600 mt-0.5">@g.Blurb</span>
+                    </span>
+                </label>
+            }
+
+            <div class="pt-2">
+                <label class="form-label">Location sharing</label>
+                <select name="LocTier" id="loctier" class="form-select max-w-xs">
+                    <option value="anon" selected="@(Model.LocTier == "anon")">Anonymous</option>
+                    <option value="region" selected="@(Model.LocTier == "region")">Region</option>
+                    <option value="data_share" selected="@(Model.LocTier == "data_share")">Data-share (postcode)</option>
+                </select>
+            </div>
+            <div id="region-field" class="@(Model.LocTier == "region" ? "" : "hidden")">
+                <label class="form-label">Region</label>
+                <select name="Region" class="form-select max-w-xs">
+                    <option value="">— choose —</option>
+                    @foreach (var r in regions)
+                    {
+                        <option value="@r.Value">@r.Label</option>
+                    }
+                </select>
+            </div>
+            <div id="postcode-field" class="@(Model.LocTier == "data_share" ? "" : "hidden")">
+                <label class="form-label">Postcode</label>
+                <input name="Postcode" class="form-input max-w-xs" placeholder="e.g. BS1 5AH" />
+                <p class="form-help">Kept private; only a coarse derived area is stored.</p>
+            </div>
+        </fieldset>
+        <div class="flex justify-end">
+            <button type="submit" class="btn-primary" disabled="@(locked ? "disabled" : null)">Save changes</button>
+        </div>
+    </form>
+
+    <!-- Erase -->
+    <div class="rounded-lg p-6 border border-red-200 bg-red-50/60">
+        <h2 class="text-lg font-bold text-red-800"><i class="fa-solid fa-trash-can mr-2"></i>Erase this node</h2>
+        <p class="text-sm text-red-700/90 mt-1">
+            Deletes the node, its token, and its private record, and writes a tombstone so its data is dropped from the
+            lake on the next acquisition cycle. This is your GDPR right to erasure and cannot be undone.
+        </p>
+        <form asp-action="DeleteNode" asp-route-id="@n.NodeId" method="post" class="mt-4"
+              onsubmit="return confirm('Erase this node and its data? This cannot be undone.');">
+            <button type="submit" class="btn-primary !bg-red-700 hover:!bg-red-800" disabled="@(locked ? "disabled" : null)">
+                Erase node &amp; data
+            </button>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        var lt = document.getElementById('loctier');
+        function syncLoc() {
+            var v = lt.value;
+            document.getElementById('region-field').classList.toggle('hidden', v !== 'region');
+            document.getElementById('postcode-field').classList.toggle('hidden', v !== 'data_share');
+        }
+        if (lt) { lt.addEventListener('change', syncLoc); syncLoc(); }
+    </script>
+}

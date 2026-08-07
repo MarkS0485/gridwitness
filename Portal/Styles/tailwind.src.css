@@ -1,0 +1,34 @@
+/* =========================================================================
+ * tailwind.src.css  -  TSGB Tailwind v4 source
+ *
+ * Compiled by the Tailwind standalone CLI into wwwroot/css/tailwind.css
+ * during build (see the BuildTailwindCss target in WebSite.csproj).
+ *
+ * Layout: layout.cshtml loads tailwind.css FIRST, then site.css, so the
+ * hand-written brand classes in site.css can override Tailwind utilities
+ * if they ever need to.
+ * ========================================================================= */
+
+@import "tailwindcss";
+
+/* ---- Content scanning -----------------------------------------------------
+ * Tailwind v4 auto-discovers most files, but we explicitly list the .cshtml
+ * directories and our JS so that no class used in markup gets purged.
+ * Paths are resolved relative to *this* file. */
+@source "../Views/**/*.cshtml";
+@source "../Areas/**/*.cshtml";
+@source "../wwwroot/js/*.js";
+
+/* ---- TSGB brand theme -----------------------------------------------------
+ * Direct port of the Play-CDN config that used to live inline in
+ * _Layout.cshtml. Adding a colour here automatically generates the full
+ * Tailwind colour utilities (bg-, text-, border-, ring-, etc.). */
+@theme {
+  --color-tsgb-navy:      #012169;
+  --color-tsgb-navy-dark: #0a1f6b;
+  --color-tsgb-red:       #C8102E;
+  --color-tsgb-red-dark:  #9b0d23;
+  --color-tsgb-burgundy:  #6b0c1c;
+
+  --font-sans: "Inter", system-ui, sans-serif;
+}

@@ -1,0 +1,49 @@
+@{
+    ViewData["Title"] = "Privacy & GDPR";
+    ViewData["Section"] = "privacy";
+}
+
+<section class="uk-gradient-hero text-white">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 py-14">
+        <h1 class="text-4xl font-extrabold">Privacy statement</h1>
+        <p class="text-white/85 mt-3">We ask for the least revealing thing that's useful, and we can justify everything we collect.</p>
+    </div>
+</section>
+
+<div class="max-w-3xl mx-auto px-4 sm:px-6 py-12">
+    <div class="prose-tsgb">
+        <h2>The deal</h2>
+        <p>GridWitness measures the GB electricity grid using sensors you already own. We ask for the least revealing thing that is useful — grid frequency — and every step beyond that is an explicit, revocable choice you make. We will never ask for data we cannot justify to you.</p>
+
+        <h2>What each thing tells us</h2>
+        <p><strong>Grid frequency</strong> is the same for everyone connected to the GB grid at a given instant. Sharing it tells us nothing about your household. It's the default, and on its own it's genuinely useful.</p>
+        <p><strong>Voltage</strong> is a reading about the feeder your house sits on, not about you. It helps map where the grid is strong or weak. Low sensitivity.</p>
+        <p><strong>Current, power and power factor</strong> are the sensitive ones. Your load reveals when you're home, sleep, cook or charge a car. We ask only if you actively choose to share it, never bundled with anything else. The reason it's worth asking: a node sharing its own power becomes self-calibrating, letting us recover local grid strength and correct the sensor. If that trade isn't worth it to you, don't share it — frequency alone still helps.</p>
+        <p><strong>Weather</strong> is outdoor ambient conditions, not your behaviour. It helps model how weather drives demand and generation. Low sensitivity; the main consideration is that it implies your rough location.</p>
+
+        <h2>Location, and how precise you want to be</h2>
+        <ul>
+            <li><strong>Anonymous</strong> (default): we derive only a rough grid supply area from your connection. No address.</li>
+            <li><strong>Region</strong>: you pick your DNO or grid region from a list. No address.</li>
+            <li><strong>Data-share</strong>: you enter your postcode so we can place your readings more precisely. Your postcode never leaves our server and is never published — only a derived area code (a grid supply point or primary substation) is attached to the data.</li>
+        </ul>
+        <p>We're honest about the ceiling: even in data-share mode we pin to a grid supply point or primary substation, not your individual street cable. We don't have the data to do that, and we won't claim to.</p>
+
+        <h2>What we keep private and never publish</h2>
+        <p>Your postcode and precise location, the link between a node and you, and your access token (kept hashed). Published data carries only a random node id and derived area codes.</p>
+
+        <h2>Your rights — and why a confirmed email matters</h2>
+        <p>Anyone can register and start contributing without confirming their email. But <strong>changing what a node shares, or deleting your data, requires a confirmed email address</strong>. That confirmation is how we prove the account is really yours before acting on your data — GDPR requires us to be sure. Every node you create is always linked to your account, so once your identity is confirmed we can always honour:</p>
+        <ul>
+            <li><strong>Rectification</strong> — change or withdraw any consent at any time from your dashboard.</li>
+            <li><strong>Erasure</strong> — "erase this node" removes your server record and marks your already-contributed data for removal from the research lake.</li>
+            <li><strong>Access</strong> — ask us what we hold about you.</li>
+        </ul>
+        <p>We collect the bare minimum personal data needed to enforce these rights: a confirmable email address and the link between your account and your nodes. Nothing more.</p>
+
+        <h2>Legal basis and controller</h2>
+        <p>The server operator is the data controller. Processing rests on explicit consent for the sensitive and location channels, and legitimate interest for the non-identifying grid-frequency research. Data is retained under a stated retention policy, and the private database is encrypted at rest.</p>
+
+        <p class="text-sm text-gray-500">This statement is being finalised and legally reviewed ahead of public onboarding.</p>
+    </div>
+</div>

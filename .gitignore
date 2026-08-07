@@ -2,7 +2,8 @@
 server/**/config.json
 server/**/*.token
 server/**/*.mmdb
-server/server_data/          # SQLite private DB + CSV staging live here
+# SQLite private DB + CSV staging live here
+server/server_data/
 gda_acquirer/config.json
 *.env
 .env
@@ -19,6 +20,21 @@ venv/
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
+
+# .NET account portal (Portal/)
+Portal/bin/
+Portal/obj/
+# downloaded Tailwind standalone CLI
+Portal/tools/
+# accounts SQLite (dev)
+Portal/App_Data/
+# build artifact (compiled from Styles/tailwind.src.css)
+Portal/wwwroot/css/tailwind.css
+**/*.user
+
+# Deployment data volumes
+/data/
+/data-dev/
 
 # HA test artifacts
 .storage/

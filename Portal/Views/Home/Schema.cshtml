@@ -1,0 +1,87 @@
+@{
+    ViewData["Title"] = "Data schema";
+    ViewData["Section"] = "schema";
+    var electrical = new[] {
+        ("frequency_hz", "Hz", "none", "System frequency, node-global (~49–51 Hz on GB)."),
+        ("voltage_v", "V", "low", "RMS voltage. A property of your local feeder, not you."),
+        ("current_a", "A", "high", "RMS current. Reveals household load; opt-in only."),
+        ("power_w", "W", "high", "Real power. Reveals household load; opt-in only."),
+        ("power_factor", "", "high", "Power factor (−1..1). Reveals load character; opt-in only."),
+        ("phase_angle_deg", "deg", "low", "Synchrophasor angle vs UTC (GPS/PMU nodes only)."),
+    };
+    var weather = new[] {
+        ("temp", "degC", "Ambient outdoor temperature."),
+        ("rhum", "%", "Relative humidity."),
+        ("wspd", "km/h", "Wind speed."),
+        ("wdir", "deg", "Wind direction (met 'from', 0=N)."),
+        ("pres", "hPa", "Atmospheric pressure."),
+        ("prcp", "mm", "Rainfall."),
+        ("solar_radiation_w_m2", "W/m2", "Shortwave irradiance."),
+        ("uv", "index", "UV index."),
+    };
+    string Badge(string s) => s switch {
+        "high" => "<span class=\"text-xs px-2 py-0.5 rounded-full bg-red-100 text-red-700\">high</span>",
+        "none" => "<span class=\"text-xs px-2 py-0.5 rounded-full bg-green-100 text-green-700\">none</span>",
+        _ => "<span class=\"text-xs px-2 py-0.5 rounded-full bg-blue-100 text-blue-700\">low</span>"
+    };
+}
+
+<section class="uk-gradient-hero text-white">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 py-14">
+        <h1 class="text-4xl font-extrabold">Data schema</h1>
+        <p class="text-white/85 mt-3">Every field you may send — with unit, type and sensitivity. Schema version <span class="font-mono">1.0</span>.</p>
+    </div>
+</section>
+
+<div class="max-w-4xl mx-auto px-4 sm:px-6 py-12 space-y-10">
+
+    <section>
+        <h2 class="text-2xl font-bold text-tsgb-navy mb-4">Electrical channels</h2>
+        <div class="overflow-x-auto glass-panel rounded-lg">
+            <table class="w-full text-sm">
+                <thead><tr class="admin-thead"><th class="p-3">Channel</th><th class="p-3">Unit</th><th class="p-3">Sensitivity</th><th class="p-3">Meaning</th></tr></thead>
+                <tbody>
+                @foreach (var (name, unit, sens, desc) in electrical)
+                {
+                    <tr class="border-b border-gray-100">
+                        <td class="p-3 font-mono text-tsgb-navy">@name</td>
+                        <td class="p-3 text-gray-500">@(string.IsNullOrEmpty(unit) ? "—" : unit)</td>
+                        <td class="p-3">@Html.Raw(Badge(sens))</td>
+                        <td class="p-3 text-gray-600">@desc</td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section>
+        <h2 class="text-2xl font-bold text-tsgb-navy mb-4">Weather channels <span class="text-sm font-normal text-gray-500">(all low sensitivity)</span></h2>
+        <div class="overflow-x-auto glass-panel rounded-lg">
+            <table class="w-full text-sm">
+                <thead><tr class="admin-thead"><th class="p-3">Channel</th><th class="p-3">Unit</th><th class="p-3">Meaning</th></tr></thead>
+                <tbody>
+                @foreach (var (name, unit, desc) in weather)
+                {
+                    <tr class="border-b border-gray-100">
+                        <td class="p-3 font-mono text-tsgb-navy">@name</td>
+                        <td class="p-3 text-gray-500">@unit</td>
+                        <td class="p-3 text-gray-600">@desc</td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section class="glass-panel rounded-lg p-6">
+        <h2 class="text-xl font-bold text-tsgb-navy">Machine-readable contract</h2>
+        <p class="text-gray-600 mt-2">The published schema is the source of truth — code against it, not this page. The live API serves:</p>
+        <ul class="mt-3 space-y-2 text-sm">
+            <li><a class="text-tsgb-red font-semibold font-mono" href="https://ingest.twinscrollgridbalancer.co.uk/openapi.json">/openapi.json</a> — OpenAPI 3 spec (import into Postman, generate a client).</li>
+            <li><span class="font-mono text-gray-700">gridwitness-ingest.v1.schema.json</span> — JSON Schema (draft 2020-12) for every request/response body.</li>
+            <li><span class="font-mono text-gray-700">channels.v1.json</span> — the channel catalogue above, machine-readable.</li>
+        </ul>
+        <a asp-action="Submitters" class="btn-primary mt-5 inline-block">Read the submitter guide</a>
+    </section>
+</div>

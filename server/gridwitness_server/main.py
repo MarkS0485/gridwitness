@@ -17,6 +17,7 @@ from . import __version__
 from .config import Settings, get_settings
 from .db import Database
 from .ratelimit import RateLimiter
+from .routes_admin import router as admin_router
 from .routes_health import router as health_router
 from .routes_ingest import router as ingest_router
 from .routes_register import router as register_router
@@ -65,6 +66,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(ingest_router)
     app.include_router(time_router)
     app.include_router(health_router)
+    app.include_router(admin_router)
     return app
 
 

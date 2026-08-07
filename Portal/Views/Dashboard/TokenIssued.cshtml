@@ -1,0 +1,72 @@
+@model TokenIssuedVm
+@{
+    ViewData["Title"] = "API key created";
+    ViewData["Section"] = "dashboard";
+    var curl = $"curl -X POST {Model.IngestBaseUrl}/v1/samples \\\n  -H \"Authorization: Bearer {Model.Token}\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{{\"node_id\":\"{Model.NodeId}\",\"electrical\":[{{\"ts_utc\":\"2026-01-01T00:00:00Z\",\"frequency_hz\":50.01}}]}}'";
+}
+
+<section class="uk-gradient-hero text-white">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 py-10">
+        <h1 class="text-3xl font-bold"><i class="fa-solid fa-circle-check mr-2"></i>API key created</h1>
+        <p class="text-white/80 mt-1">@Model.DeviceType</p>
+    </div>
+</section>
+
+<div class="max-w-3xl mx-auto px-4 sm:px-6 py-8 space-y-6">
+
+    <div class="alert alert-warning">
+        <i class="fa-solid fa-triangle-exclamation mt-0.5"></i>
+        <div>
+            <strong>Copy your token now — this is the only time it's shown.</strong>
+            We store only a hash of it, so we can never show it again. If you lose it, delete this node and create a new key.
+        </div>
+    </div>
+
+    <div class="glass-panel rounded-lg p-6">
+        <div class="form-label">Node ID</div>
+        <div class="flex items-center gap-2 mb-4">
+            <code id="nodeid" class="flex-1 bg-gray-100 rounded px-3 py-2 text-sm font-mono break-all">@Model.NodeId</code>
+            <button class="btn-outline !py-2 !px-3" onclick="copyEl('nodeid', this)"><i class="fa-solid fa-copy"></i></button>
+        </div>
+
+        <div class="form-label">API token (Bearer)</div>
+        <div class="flex items-center gap-2">
+            <code id="token" class="flex-1 bg-gray-900 text-green-300 rounded px-3 py-2 text-sm font-mono break-all">@Model.Token</code>
+            <button class="btn-primary !py-2 !px-3" onclick="copyEl('token', this)"><i class="fa-solid fa-copy"></i></button>
+        </div>
+
+        @if (!string.IsNullOrEmpty(Model.LocRef))
+        {
+            <p class="mt-4 text-sm text-gray-600">Derived location: <span class="font-mono">@Model.LocRef</span></p>
+        }
+    </div>
+
+    <div>
+        <h3 class="font-bold text-tsgb-navy mb-2">Send your first sample</h3>
+        <div class="code-block">
+            <div class="code-block-head"><span class="file"><i class="fa-solid fa-terminal"></i> quickstart.sh</span><span class="tag">POST /v1/samples</span></div>
+            <div class="code-block-body"><pre id="curl">@curl</pre></div>
+        </div>
+        <p class="text-sm text-gray-600">
+            Using Home Assistant? Install the GridWitness integration, set the server URL to
+            <span class="font-mono">@Model.IngestBaseUrl</span> and paste the token when asked.
+        </p>
+    </div>
+
+    <div class="flex justify-end">
+        <a asp-action="Index" class="btn-primary">Done — back to dashboard</a>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function copyEl(id, btn) {
+            var text = document.getElementById(id).innerText;
+            navigator.clipboard.writeText(text).then(function () {
+                var old = btn.innerHTML;
+                btn.innerHTML = '<i class="fa-solid fa-check"></i>';
+                setTimeout(function () { btn.innerHTML = old; }, 1200);
+            });
+        }
+    </script>
+}

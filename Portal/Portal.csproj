@@ -1,0 +1,61 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>GridWitness.Portal</RootNamespace>
+    <UserSecretsId>gridwitness-portal-8f2a1c94-77bd-4e0e-9a11-2b6f0d3c5e10</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="LigerShark.WebOptimizer.Core" Version="3.0.477" />
+    <PackageReference Include="MailKit" Version="4.17.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="10.0.10" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="10.0.10" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="10.0.10" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.10" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.10" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.10" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- The Styles/ folder holds the Tailwind source only. It is NOT copied to the
+         publish output — only the compiled wwwroot/css/tailwind.css ships. -->
+    <Content Remove="Styles\**" />
+    <None Include="Styles\**" />
+  </ItemGroup>
+
+  <!-- =========================================================================
+       Tailwind CSS — local build, no Node, no npm (identical to the TSGBWebsite
+       wiring). The standalone CLI is downloaded once into tools/tailwind-X.Y.Z/
+       and re-used by every build. It compiles Styles/tailwind.src.css into
+       wwwroot/css/tailwind.css, which the layout loads before site.css.
+       ========================================================================= -->
+  <PropertyGroup>
+    <TailwindVersion>4.3.0</TailwindVersion>
+    <TailwindCliDir>$(MSBuildProjectDirectory)/tools/tailwind-$(TailwindVersion)</TailwindCliDir>
+    <TailwindCliFile Condition="'$(OS)' == 'Windows_NT'">tailwindcss-windows-x64.exe</TailwindCliFile>
+    <TailwindCliFile Condition="'$(OS)' != 'Windows_NT'">tailwindcss-linux-x64</TailwindCliFile>
+    <TailwindCliPath>$(TailwindCliDir)/$(TailwindCliFile)</TailwindCliPath>
+    <TailwindCliUrl>https://github.com/tailwindlabs/tailwindcss/releases/download/v$(TailwindVersion)/$(TailwindCliFile)</TailwindCliUrl>
+
+    <TailwindInputCss>$(MSBuildProjectDirectory)/Styles/tailwind.src.css</TailwindInputCss>
+    <TailwindOutputCss>$(MSBuildProjectDirectory)/wwwroot/css/tailwind.css</TailwindOutputCss>
+  </PropertyGroup>
+
+  <Target Name="DownloadTailwindCli" BeforeTargets="BuildTailwindCss" Condition="!Exists('$(TailwindCliPath)')">
+    <MakeDir Directories="$(TailwindCliDir)" />
+    <Message Text="Tailwind: downloading $(TailwindCliUrl)" Importance="high" />
+    <DownloadFile SourceUrl="$(TailwindCliUrl)"
+                  DestinationFolder="$(TailwindCliDir)"
+                  SkipUnchangedFiles="true" />
+    <Exec Command="chmod +x &quot;$(TailwindCliPath)&quot;" Condition="'$(OS)' != 'Windows_NT'" />
+  </Target>
+
+  <Target Name="BuildTailwindCss" BeforeTargets="AssignTargetPaths;BeforeBuild">
+    <Message Text="Tailwind: compiling $(TailwindInputCss) -&gt; $(TailwindOutputCss)" Importance="high" />
+    <Exec Command="&quot;$(TailwindCliPath)&quot; --input &quot;$(TailwindInputCss)&quot; --output &quot;$(TailwindOutputCss)&quot; --minify" />
+  </Target>
+
+</Project>

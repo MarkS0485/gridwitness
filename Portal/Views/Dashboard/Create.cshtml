@@ -1,0 +1,111 @@
+@model CreateNodeVm
+@{
+    ViewData["Title"] = "New API key";
+    ViewData["Section"] = "dashboard";
+    var groups = GridWitnessCatalogue.ConsentGroups;
+    var regions = GridWitnessCatalogue.Regions;
+}
+
+<section class="uk-gradient-hero text-white">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 py-10">
+        <h1 class="text-3xl font-bold">Create an API key</h1>
+        <p class="text-white/80 mt-1">One key registers one measurement node. You choose exactly what it shares.</p>
+    </div>
+</section>
+
+<div class="max-w-3xl mx-auto px-4 sm:px-6 py-8">
+    <form asp-action="Create" method="post" class="glass-panel rounded-lg p-6 space-y-6">
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+        <div>
+            <label class="form-label" asp-for="DeviceType">Name / device</label>
+            <input asp-for="DeviceType" class="form-input" placeholder="e.g. Home Assistant — Shelly Pro 3EM" />
+            <p class="form-help">A label so you can recognise this node later (also recorded as its device type).</p>
+            <span asp-validation-for="DeviceType" class="form-error"></span>
+        </div>
+
+        <div>
+            <div class="form-label">What this node shares</div>
+            <p class="form-help mb-3">Consent is per data-type and always reversible. Share only what you're comfortable with.</p>
+            <div class="space-y-2">
+                @foreach (var g in groups)
+                {
+                    var checkedAttr = (Model.Groups.Contains(g.Key) || g.DefaultOn) ? "checked" : null;
+                    <label class="flex items-start gap-3 p-3 rounded-lg border border-gray-200 hover:border-tsgb-navy/40 cursor-pointer">
+                        <input type="checkbox" name="Groups" value="@g.Key" checked="@checkedAttr" class="mt-1" style="accent-color:#C8102E;width:1rem;height:1rem;" />
+                        <span>
+                            <span class="font-semibold text-tsgb-navy">@g.Title</span>
+                            @if (g.Sensitivity == "high")
+                            {
+                                <span class="ml-2 text-xs px-2 py-0.5 rounded-full bg-red-100 text-red-700">reveals load · opt-in</span>
+                            }
+                            else if (g.Sensitivity == "none")
+                            {
+                                <span class="ml-2 text-xs px-2 py-0.5 rounded-full bg-green-100 text-green-700">recommended</span>
+                            }
+                            <span class="block text-sm text-gray-600 mt-0.5">@g.Blurb</span>
+                        </span>
+                    </label>
+                }
+            </div>
+            <span asp-validation-for="Groups" class="form-error"></span>
+        </div>
+
+        <div>
+            <div class="form-label">Location sharing</div>
+            <p class="form-help mb-3">More precise location makes voltage &amp; angle data scientifically useful — but it's entirely your choice. A postcode never leaves the server; only a coarse derived area is ever stored with your data.</p>
+            <div class="space-y-2" id="loctiers">
+                @foreach (var (val, title, blurb) in new[] {
+                    ("anon", "Anonymous", "No location. Perfect for frequency, which is the same everywhere."),
+                    ("region", "Region", "Pick a GB region from a list. No address."),
+                    ("data_share", "Data-share", "Enter a postcode; we derive a coarse grid area and keep the postcode private.") })
+                {
+                    <label class="flex items-start gap-3 p-3 rounded-lg border border-gray-200 hover:border-tsgb-navy/40 cursor-pointer">
+                        <input type="radio" name="LocTier" value="@val" checked="@(Model.LocTier == val)" class="mt-1 loctier" style="accent-color:#C8102E;width:1rem;height:1rem;" />
+                        <span>
+                            <span class="font-semibold text-tsgb-navy">@title</span>
+                            <span class="block text-sm text-gray-600 mt-0.5">@blurb</span>
+                        </span>
+                    </label>
+                }
+            </div>
+        </div>
+
+        <div id="region-field" class="hidden">
+            <label class="form-label" asp-for="Region">Region</label>
+            <select asp-for="Region" class="form-select">
+                <option value="">— choose a region —</option>
+                @foreach (var r in regions)
+                {
+                    <option value="@r.Value">@r.Label</option>
+                }
+            </select>
+            <span asp-validation-for="Region" class="form-error"></span>
+        </div>
+
+        <div id="postcode-field" class="hidden">
+            <label class="form-label" asp-for="Postcode">Postcode</label>
+            <input asp-for="Postcode" class="form-input" placeholder="e.g. BS1 5AH" />
+            <p class="form-help">Kept private on the server. Only a coarse derived area is stored with your data.</p>
+            <span asp-validation-for="Postcode" class="form-error"></span>
+        </div>
+
+        <div class="flex items-center justify-between pt-2">
+            <a asp-action="Index" class="btn-outline">Cancel</a>
+            <button type="submit" class="btn-primary"><i class="fa-solid fa-key mr-2"></i>Issue key</button>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        function syncLocFields() {
+            var v = document.querySelector('input[name="LocTier"]:checked')?.value;
+            document.getElementById('region-field').classList.toggle('hidden', v !== 'region');
+            document.getElementById('postcode-field').classList.toggle('hidden', v !== 'data_share');
+        }
+        document.querySelectorAll('.loctier').forEach(function (el) { el.addEventListener('change', syncLocFields); });
+        syncLocFields();
+    </script>
+}

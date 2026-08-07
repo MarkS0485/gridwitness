@@ -34,18 +34,24 @@ class Settings:
     geoip_mmdb: Path | None          # optional MaxMind GeoLite2 for the ANON tier
     # rate limit: allow this many rows per node per minute before 429
     rate_rows_per_min: int
+    # Shared secret for the internal admin API (account portal -> server). When unset, the whole
+    # /v1/admin surface is disabled and account-linked provisioning is refused. Never crosses the
+    # public internet — the portal calls the server over the private container network.
+    internal_key: str | None = None
     version: str = "0.1.0"
 
     @classmethod
     def from_env(cls) -> "Settings":
         data_dir = _env_path("GW_DATA_DIR", _DEFAULT_DATA)
         mmdb = os.environ.get("GW_GEOIP_MMDB")
+        internal_key = os.environ.get("GW_INTERNAL_KEY") or None
         return cls(
             data_dir=data_dir,
             db_path=_env_path("GW_DB_PATH", data_dir / "gridwitness.db"),
             staging_dir=_env_path("GW_STAGING_DIR", data_dir / "staging"),
             geoip_mmdb=Path(mmdb) if mmdb else None,
             rate_rows_per_min=_env_int("GW_RATE_ROWS_PER_MIN", 6000),
+            internal_key=internal_key,
         )
 
     def ensure_dirs(self) -> None:

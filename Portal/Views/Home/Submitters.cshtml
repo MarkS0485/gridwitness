@@ -1,0 +1,57 @@
+@{
+    ViewData["Title"] = "API & submitters";
+    ViewData["Section"] = "api";
+    var samples = "curl -X POST https://ingest.twinscrollgridbalancer.co.uk/v1/samples \\\n  -H \"authorization: Bearer $TOKEN\" -H 'content-type: application/json' \\\n  -d '{\n    \"node_id\": \"'\"$NODE_ID\"'\",\n    \"client_send_ts\": \"2026-07-16T14:32:35.010Z\",\n    \"schema_version\": \"1.0\",\n    \"electrical\": [\n      {\"ts_utc\": \"2026-07-16T14:32:05.250Z\", \"ts_source\": \"device\", \"phase\": \"1p\", \"frequency_hz\": 49.998, \"voltage_v\": 241.2}\n    ]\n  }'";
+}
+
+<section class="uk-gradient-hero text-white">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 py-14">
+        <h1 class="text-4xl font-extrabold">API &amp; submitters</h1>
+        <p class="text-white/85 mt-3 text-lg">GridWitness isn't tied to Home Assistant. Anyone with grid or weather measurements can submit them against the published, versioned schema.</p>
+    </div>
+</section>
+
+<div class="max-w-4xl mx-auto px-4 sm:px-6 py-12 space-y-10">
+
+    <section>
+        <h2 class="text-2xl font-bold text-tsgb-navy">Concepts</h2>
+        <div class="mt-4 grid gap-4 md:grid-cols-2">
+            <div class="card p-5"><strong class="text-tsgb-navy">Node</strong><p class="text-sm text-gray-600 mt-1">One measurement point or stream. Register one node per site — it has a random <span class="font-mono">node_id</span> and a bearer token.</p></div>
+            <div class="card p-5"><strong class="text-tsgb-navy">Channels</strong><p class="text-sm text-gray-600 mt-1">The named quantities you send (see the <a asp-action="Schema" class="text-tsgb-red font-semibold">schema</a>). Electrical and weather.</p></div>
+            <div class="card p-5"><strong class="text-tsgb-navy">Consent set</strong><p class="text-sm text-gray-600 mt-1">The channels a node may send, chosen at registration. The server rejects any row outside the set — you cannot accidentally over-submit.</p></div>
+            <div class="card p-5"><strong class="text-tsgb-navy">Producer</strong><p class="text-sm text-gray-600 mt-1">A string naming your software, e.g. <span class="font-mono">acme-energy-app/2.3</span>, recorded for attribution and support.</p></div>
+        </div>
+    </section>
+
+    <div class="section-divider-slim"></div>
+
+    <section>
+        <h2 class="text-2xl font-bold text-tsgb-navy">1 · Get a key</h2>
+        <p class="text-gray-600 mt-2">The easiest way is to <a asp-area="Identity" asp-page="/Account/Register" class="text-tsgb-red font-semibold">create an account</a> and issue a key from your <a asp-controller="Dashboard" asp-action="Index" class="text-tsgb-red font-semibold">dashboard</a> — pick the channels and location tier, and the token is shown once. A key issued this way is tied to your account, so you can manage or erase it later.</p>
+    </section>
+
+    <section>
+        <h2 class="text-2xl font-bold text-tsgb-navy">2 · Send batches</h2>
+        <p class="text-gray-600 mt-2"><span class="font-mono">POST /v1/samples</span> with your Bearer token. Timestamps are UTC ISO-8601 with a <span class="font-mono">Z</span>; electrical rows use <span class="font-mono">ts_utc</span>, weather rows use <span class="font-mono">time</span>. One row per phase where applicable (single phase is <span class="font-mono">1p</span>).</p>
+        <div class="code-block mt-4">
+            <div class="code-block-head"><span class="file"><i class="fa-solid fa-terminal"></i> send.sh</span><span class="tag">POST /v1/samples</span></div>
+            <div class="code-block-body"><pre>@samples</pre></div>
+        </div>
+        <p class="text-sm text-gray-600">The response echoes <span class="font-mono">server_receive_ts</span> (pair it with your send time for an NTP-style transport offset), plus <span class="font-mono">accepted</span>, <span class="font-mono">duplicates</span>, and any <span class="font-mono">rejected</span> rows with reasons.</p>
+    </section>
+
+    <section>
+        <h2 class="text-2xl font-bold text-tsgb-navy">3 · Handle the responses</h2>
+        <div class="mt-4 space-y-2">
+            <div class="kpi-tile"><strong class="text-tsgb-navy">Deduplication</strong> — rows are idempotent on <span class="font-mono">(node_id, ts_utc, phase)</span>. Re-sending is safe; it counts as a duplicate, not an error. This makes retries and backfill safe.</div>
+            <div class="kpi-tile"><strong class="text-tsgb-navy">Backpressure</strong> — <span class="font-mono">503</span> with <span class="font-mono">Retry-After</span> means busy; buffer and retry later.</div>
+            <div class="kpi-tile"><strong class="text-tsgb-navy">Rate limit</strong> — <span class="font-mono">429</span> means too fast for this node; back off.</div>
+            <div class="kpi-tile"><strong class="text-tsgb-navy">Validation</strong> — <span class="font-mono">400</span> returns a per-row <span class="font-mono">rejected</span> list telling you exactly what was wrong.</div>
+        </div>
+    </section>
+
+    <section class="glass-panel rounded-lg p-6">
+        <h2 class="text-xl font-bold text-tsgb-navy">Submitting on behalf of other people?</h2>
+        <p class="text-gray-600 mt-2">Honour the same deal the Home Assistant integration makes: only register the channels the person agreed to share (current and power are never a default), never put personal data in rows, and support withdrawal. Historical backfill is welcome — rows keep their original timestamps and gaps stay visible rather than being papered over.</p>
+    </section>
+</div>

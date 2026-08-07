@@ -129,6 +129,10 @@ class RegisterRequest(BaseModel):
     # Who is submitting: the client software name/version, e.g. "gridwitness-ha/0.1.0" or
     # "acme-energy-app/2.3". Third-party submitters should set this; stored server-side for provenance.
     producer: str | None = None
+    # Account link. Set only by the trusted portal (requires the internal credential); ties this node
+    # to a confirmed-able account so ownership is provable and GDPR erasure can be honoured. The public
+    # HA path leaves this null and registration stays open as before.
+    contributor_ref: str | None = None
     schema_version: str = SCHEMA_VERSION
 
     @field_validator("channels")
@@ -187,6 +191,39 @@ class ConsentUpdate(BaseModel):
 
 class DeleteRequest(BaseModel):
     node_id: str
+
+
+# --- Internal admin API (account portal only) -----------------------------------------------------
+
+class AdminNodeView(BaseModel):
+    """A node as shown to its owning account in the portal dashboard. No token, no private location."""
+    node_id: str
+    device_type: str | None = None
+    firmware: str | None = None
+    cadence_ms: int | None = None
+    loc_tier: str
+    loc_ref: str | None = None
+    cell_id: str | None = None
+    channels: list[str] = Field(default_factory=list)
+    producer: str | None = None
+    created_utc: str
+
+
+class AdminConsentUpdate(BaseModel):
+    """Portal-side consent/location change for one owned node. node_id + owner come from the route."""
+    channels: list[str] | None = None
+    loc_tier: LocTier | None = None
+    region: str | None = None
+    postcode: str | None = None
+
+    @field_validator("channels")
+    @classmethod
+    def _known(cls, v: list[str] | None) -> list[str] | None:
+        if v is not None:
+            unknown = set(v) - ALL_CHANNELS
+            if unknown:
+                raise ValueError(f"unknown channels: {sorted(unknown)}")
+        return v
 
 
 class TimeEchoRequest(BaseModel):

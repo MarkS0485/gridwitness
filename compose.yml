@@ -1,0 +1,47 @@
+# GridWitness production stack (OVH box), fronted by the shared host nginx.
+#   portal  127.0.0.1:8081   ASP.NET Core account portal (accounts, dashboard, API keys)
+#   ingest  127.0.0.1:8001   Python FastAPI ingest engine (HA plugin + submitters + GDA acquirer)
+#
+# nginx (host-level, see D:\Work\ServerInfra) owns :80/:443, terminates TLS, and routes
+# ingest.twinscrollgridbalancer.co.uk: /v1|/openapi|/schema -> ingest, everything else -> portal.
+# The portal reaches ingest over the private compose network at http://ingest:8000 with GW_INTERNAL_KEY.
+# Ports are published on loopback only so nothing but nginx can reach them.
+#   deploy:  docker compose up -d --build   (needs a .env alongside — see .env.example)
+name: gridwitness
+
+services:
+  ingest:
+    build: ./server
+    environment:
+      GW_INTERNAL_KEY: ${GW_INTERNAL_KEY:?set GW_INTERNAL_KEY in .env}
+      GW_DATA_DIR: /data
+    volumes:
+      - ./data/ingest:/data          # private SQLite + CSV staging (back up encrypted)
+    ports:
+      - "127.0.0.1:8001:8000"
+    restart: unless-stopped
+
+  portal:
+    build: ./Portal
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      GW_INGEST_BASE: http://ingest:8000
+      GW_INTERNAL_KEY: ${GW_INTERNAL_KEY:?set GW_INTERNAL_KEY in .env}
+      Ingest__PublicUrl: https://ingest.twinscrollgridbalancer.co.uk
+      ConnectionStrings__DefaultConnection: Data Source=/app/App_Data/portal.db
+      # Proton SMTP (same account as TSGBWebsite). Only the token is a secret in .env; the rest default
+      # here. Leave SMTP_PASSWORD blank to disable sending (confirmation links log to stdout instead).
+      Smtp__Host: ${SMTP_HOST:-smtp.protonmail.ch}
+      Smtp__Port: ${SMTP_PORT:-587}
+      Smtp__UseStartTls: ${SMTP_STARTTLS:-true}
+      Smtp__User: ${SMTP_USER:-noreply@twinscrollgridbalancer.co.uk}
+      Smtp__Password: ${SMTP_PASSWORD:-}
+      Smtp__FromEmail: ${SMTP_FROM:-noreply@twinscrollgridbalancer.co.uk}
+      Smtp__FromName: ${SMTP_FROMNAME:-GridWitness}
+    volumes:
+      - ./data/portal:/app/App_Data   # accounts SQLite
+    ports:
+      - "127.0.0.1:8081:8080"
+    depends_on:
+      - ingest
+    restart: unless-stopped

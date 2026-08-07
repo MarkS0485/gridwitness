@@ -1,0 +1,31 @@
+# GridWitness local/dev stack — no Caddy, no TLS. Portal on :5080, ingest on :8000, host-published so
+# you can hit both directly. Uses a throwaway internal key by default.
+#   docker compose -f compose.dev.yml up --build
+name: gridwitness-dev
+
+services:
+  ingest:
+    build: ./server
+    environment:
+      GW_INTERNAL_KEY: ${GW_INTERNAL_KEY:-devsecret}
+      GW_DATA_DIR: /data
+    volumes:
+      - ./data-dev/ingest:/data
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+
+  portal:
+    build: ./Portal
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      GW_INGEST_BASE: http://ingest:8000
+      GW_INTERNAL_KEY: ${GW_INTERNAL_KEY:-devsecret}
+      ConnectionStrings__DefaultConnection: Data Source=/app/App_Data/portal.db
+    volumes:
+      - ./data-dev/portal:/app/App_Data
+    ports:
+      - "5080:8080"
+    depends_on:
+      - ingest
+    restart: unless-stopped

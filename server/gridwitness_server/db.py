@@ -91,6 +91,7 @@ class Database:
         postcode: str | None,
         raw_region: str | None,
         producer: str | None = None,
+        contributor_ref: str | None = None,
     ) -> None:
         with self._lock:
             self._conn.execute(
@@ -105,8 +106,8 @@ class Database:
             )
             self._conn.execute(
                 "INSERT INTO node_private(node_id, postcode, raw_region, contributor_ref) "
-                "VALUES (?,?,?,NULL)",
-                (node_id, postcode, raw_region),
+                "VALUES (?,?,?,?)",
+                (node_id, postcode, raw_region, contributor_ref),
             )
             self._conn.commit()
 
@@ -174,6 +175,32 @@ class Database:
                 "SELECT token_sha256 FROM tokens WHERE node_id=?", (node_id,)
             ).fetchone()
         return row["token_sha256"] if row else None
+
+    def get_contributor_ref(self, node_id: str) -> str | None:
+        """The account that owns this node (None for legacy/HA nodes with no account link)."""
+        with self._lock:
+            row = self._conn.execute(
+                "SELECT contributor_ref FROM node_private WHERE node_id=?", (node_id,)
+            ).fetchone()
+        return row["contributor_ref"] if row else None
+
+    def get_nodes_by_contributor(self, contributor_ref: str) -> list[dict[str, Any]]:
+        """All live nodes owned by an account, newest first. Channels returned as a sorted list."""
+        with self._lock:
+            rows = self._conn.execute(
+                "SELECT n.node_id, n.created_utc, n.device_type, n.firmware, n.cadence_ms, "
+                "       n.loc_tier, n.loc_ref, n.cell_id, n.channels, n.producer "
+                "FROM nodes n JOIN node_private p ON p.node_id = n.node_id "
+                "WHERE p.contributor_ref = ? AND n.deleted_utc IS NULL "
+                "ORDER BY n.created_utc DESC",
+                (contributor_ref,),
+            ).fetchall()
+        out: list[dict[str, Any]] = []
+        for row in rows:
+            d = dict(row)
+            d["channels"] = sorted(json.loads(d["channels"]))
+            out.append(d)
+        return out
 
     def ok(self) -> bool:
         try:

@@ -1,0 +1,12 @@
+# GridWitness, one domain, two services. Caddy fetches and auto-renews a Let's Encrypt cert.
+# The ingest API (HA plugin, submitters, GDA acquirer contract) keeps /v1/* and the schema/OpenAPI
+# routes; everything else is the themed account portal. The internal admin credential never leaves
+# the private container network — it is not exposed on any public path here.
+ingest.twinscrollgridbalancer.co.uk {
+	# Machine ingest surface -> Python FastAPI
+	@api path /v1/* /openapi* /docs* /schema*
+	reverse_proxy @api ingest:8000
+
+	# Human surface (marketing, accounts, dashboard) -> ASP.NET Core portal
+	reverse_proxy portal:8080
+}

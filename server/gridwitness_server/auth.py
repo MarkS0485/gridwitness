@@ -50,3 +50,20 @@ def authenticate_node(request: Request, node_id: str) -> dict:
     if stored is None or presented is None or not hmac.compare_digest(stored, presented):
         raise HTTPException(status_code=401, detail="invalid token for node")
     return node
+
+
+def require_internal(
+    request: Request,
+    x_gw_internal: str | None = Header(default=None),
+) -> None:
+    """Dependency: authenticate a trusted internal caller (the account portal).
+
+    Guards the whole /v1/admin surface and account-linked provisioning. If no ``internal_key`` is
+    configured the admin API does not exist (404), so an unconfigured server can never be driven by
+    a forged header. When configured, the presented ``X-GW-Internal`` header must match exactly.
+    """
+    configured = request.app.state.settings.internal_key
+    if not configured:
+        raise HTTPException(status_code=404, detail="not found")
+    if not x_gw_internal or not hmac.compare_digest(x_gw_internal, configured):
+        raise HTTPException(status_code=401, detail="invalid internal credential")
