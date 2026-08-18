@@ -1,4 +1,4 @@
-using GridWitness.Portal.Data;
+using WebSite.Data;
 using GridWitness.Portal.Services;
 using GridWitness.Portal.Services.Security;
 using Microsoft.AspNetCore.DataProtection;
@@ -29,7 +29,7 @@ builder.Services.Configure<ForwardedHeadersOptions>(o =>
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
     ?? "Data Source=App_Data/portal.db";
 var dbProvider = builder.Configuration["Database:Provider"] ?? "Sqlite";
-builder.Services.AddDbContext<PortalDbContext>(options =>
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
     if (string.Equals(dbProvider, "SqlServer", StringComparison.OrdinalIgnoreCase))
         options.UseSqlServer(connectionString);
@@ -63,7 +63,7 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options =>
         options.SignIn.RequireConfirmedAccount = false;
         options.Password.RequiredLength = 8;
     })
-    .AddEntityFrameworkStores<PortalDbContext>();
+    .AddEntityFrameworkStores<ApplicationDbContext>();
 
 // ---- Auth cookie: cross-subdomain SSO ----
 // The cookie name MUST match the estate's Identity cookie and, for SSO, the Domain MUST be the shared
@@ -143,8 +143,13 @@ Directory.CreateDirectory(Path.Combine(app.Environment.ContentRootPath, "App_Dat
 if (app.Configuration.GetValue("Database:ManageSchema", true))
 {
     using var scope = app.Services.CreateScope();
-    var db = scope.ServiceProvider.GetRequiredService<PortalDbContext>();
-    db.Database.Migrate();
+    var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    // The unified Estate.Data migration set targets SQL Server; standalone SQLite
+    // dev builds the schema directly from the model instead.
+    if (db.Database.IsSqlite())
+        db.Database.EnsureCreated();
+    else
+        db.Database.Migrate();
 }
 else
 {

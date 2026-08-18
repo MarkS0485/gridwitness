@@ -21,6 +21,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!-- The single shared estate EF model (unified ApplicationDbContext). -->
+    <ProjectReference Include="..\..\Estate.Data\Estate.Data.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <!-- The Styles/ folder holds the Tailwind source only. It is NOT copied to the
          publish output — only the compiled wwwroot/css/tailwind.css ships. -->
     <Content Remove="Styles\**" />
