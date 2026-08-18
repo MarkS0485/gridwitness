@@ -22,7 +22,7 @@
 
   <ItemGroup>
     <!-- The single shared estate EF model (unified ApplicationDbContext). -->
-    <PackageReference Include="Estate.Data" Version="1.0.0" />
+    <PackageReference Include="Estate.Data" Version="1.0.1" />
   </ItemGroup>
 
   <ItemGroup>
