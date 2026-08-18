@@ -5,7 +5,7 @@ FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
 
 COPY Portal.csproj nuget.config ./
-RUN --mount=type=secret,id=gh_packages_token,env=GH_PACKAGES_TOKEN  dotnet restore Portal.csproj
+RUN --mount=type=secret,id=gh_packages_token GH_PACKAGES_TOKEN="$(cat /run/secrets/gh_packages_token)" dotnet restore Portal.csproj
 
 COPY . .
 RUN dotnet publish Portal.csproj -c Release -o /app
