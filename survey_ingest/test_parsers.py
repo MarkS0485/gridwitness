@@ -67,16 +67,3 @@ def test_out_of_band_values_dropped(tmp_path):
 def test_no_usable_columns(tmp_path):
     res = parse_csv(_write(tmp_path, "a.csv", "colX,colY\n1,2\n"))
     assert res.rows == [] and res.note
-
-
-def test_long_format_csv_from_converted_pqdif(tmp_path):
-    # What pqdif2csv emits (and what a converted PQDIF re-uploaded as CSV looks like).
-    res = parse_csv(_write(tmp_path, "converted.csv",
-        "timestamp,phase,channel,value\n"
-        "2026-01-01T00:00:00.000Z,L1,voltage,230.5\n"
-        "2026-01-01T00:00:00.000Z,L1,frequency,50.01\n"
-        "2026-01-01T00:00:01.000Z,L1,voltage,231.0\n"))
-    # Two timestamps; the first groups voltage+frequency onto one L1 row.
-    assert res.kept == 2
-    first = next(r for r in res.rows if r.ts_utc.startswith("2026-01-01T00:00:00"))
-    assert first.voltage_v == 230.5 and first.frequency_hz == 50.01

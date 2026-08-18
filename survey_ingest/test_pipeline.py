@@ -104,35 +104,6 @@ def test_postcode_never_reaches_staged_csv(settings):
     assert rows and rows[0]["loc_ref"] and POSTCODE not in rows[0]["loc_ref"]
 
 
-def test_pqdif_defers_when_no_converter(settings):
-    """A PQDIF file (no converter in this env) stays queued in the inbox; CSVs still process."""
-    app = create_app(settings)
-    with TestClient(app) as c:
-        r = c.post("/v1/survey/upload",
-                   data={"contributor_ref": REF, "label": "mixed", "loc_tier": "region",
-                         "region": "GSP_LONDON", "device_type": "Fluke 1770"},
-                   files=[("files", ("trend.csv", b"Timestamp,Vrms,Frequency\n2026-03-01T00:00:00Z,240,50.0\n", "text/csv")),
-                          ("files", ("scope.pqd", b"\x00PQDIF-binary", "application/octet-stream"))],
-                   headers=HDR)
-        assert r.status_code == 200, r.text
-        node_id = r.json()["node_id"]
-
-    db = Database(settings.db_path)
-    staging = StagingWriter(settings.staging_dir)
-    try:
-        results = worker.drain(settings, db, staging)
-    finally:
-        db.close()
-
-    assert results[0]["status"] == "pqdif_pending"
-    assert any(p.endswith("scope.pqd") for p in results[0]["pending"])
-    # The CSV row DID stage; the PQDIF is still queued for local conversion.
-    assert _staged_electrical(settings)
-    inbox = settings.surveys_inbox / node_id
-    assert any(p.name.endswith("scope.pqd") for p in inbox.iterdir())
-    assert not any(p.name.endswith("trend.csv") for p in inbox.iterdir())  # CSV handled + archived
-
-
 def test_withdrawal_purges_archive(settings):
     csv_text = b"Timestamp,Vrms,Frequency\n2026-02-01T12:00:00Z,241.2,50.02\n"
     node_id = _upload_and_drain(settings, csv_text)

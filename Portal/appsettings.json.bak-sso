@@ -1,0 +1,28 @@
+{
+  "ConnectionStrings": {
+    "DefaultConnection": "Data Source=App_Data/portal.db"
+  },
+  "Ingest": {
+    "BaseUrl": "http://localhost:8000",
+    "InternalKey": ""
+  },
+  "Smtp": {
+    "Host": "",
+    "Port": 587,
+    "User": "",
+    "Password": "",
+    "FromEmail": "no-reply@twinscrollgridbalancer.co.uk",
+    "FromName": "GridWitness",
+    "UseStartTls": true
+  },
+  "Bundling": {
+    "Enabled": true
+  },
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "AllowedHosts": "*"
+}

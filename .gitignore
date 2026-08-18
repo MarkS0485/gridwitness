@@ -43,3 +43,6 @@ tests/**/.storage/
 # OS
 .DS_Store
 Thumbs.db
+data/
+**/staging/
+**/App_Data/

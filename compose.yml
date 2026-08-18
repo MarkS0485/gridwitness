@@ -96,7 +96,5 @@ networks:
     external: true
 
 secrets:
-  # Private GitHub Packages token for restoring Estate.Data at build time (host
-  # GH_PACKAGES_TOKEN env var). export GH_PACKAGES_TOKEN=$(gh auth token) before build.
   gh_packages_token:
     environment: GH_PACKAGES_TOKEN
