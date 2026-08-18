@@ -14,6 +14,10 @@
     <div class="prose-tsgb">
         <h2>The deal</h2>
         <p>GridWitness measures the GB electricity grid using sensors you already own. We ask for the least revealing thing that is useful — grid frequency — and every step beyond that is an explicit, revocable choice you make. We will never ask for data we cannot justify to you.</p>
+        <p><strong>It's your data.</strong> We will never sell it — there is no money in this for us, we're interested in the readings themselves. We use them, and we make them available to the grid's system and network operators (NESO, the DNOs) so the whole system understands itself better. You can withdraw at any time and take a copy of your data with you.</p>
+
+        <h2>Contributing a survey</h2>
+        <p>If you're an electrician or engineer already running power-quality surveys, you can upload your analyser exports (CSV or PQDIF) and we keep <strong>only the frequency and voltage</strong> from them. Current, power, harmonics and everything else in the file are discarded before anything is stored — the extraction is a strict allow-list, not a promise. Because a voltage reading is only useful pinned to a place, surveys carry at least a region (a postcode, if you give one, stays private and is only turned into a coarse grid area). Every survey is yours: withdraw it or download it whenever you like.</p>
 
         <h2>What each thing tells us</h2>
         <p><strong>Grid frequency</strong> is the same for everyone connected to the GB grid at a given instant. Sharing it tells us nothing about your household. It's the default, and on its own it's genuinely useful.</p>
@@ -36,7 +40,8 @@
         <p>Anyone can register and start contributing without confirming their email. But <strong>changing what a node shares, or deleting your data, requires a confirmed email address</strong>. That confirmation is how we prove the account is really yours before acting on your data — GDPR requires us to be sure. Every node you create is always linked to your account, so once your identity is confirmed we can always honour:</p>
         <ul>
             <li><strong>Rectification</strong> — change or withdraw any consent at any time from your dashboard.</li>
-            <li><strong>Erasure</strong> — "erase this node" removes your server record and marks your already-contributed data for removal from the research lake.</li>
+            <li><strong>Erasure</strong> — "erase this node" or "withdraw this survey" removes your server record and raw files, and drops your already-contributed data from the research lake on the next cycle. The one thing that can't be un-made is analysis already built while your data was live — aggregate maps, trained models, fused datasets — and none of it identifies you or your site.</li>
+            <li><strong>Portability</strong> — "download my data" gives you a zip of your uploaded files and the frequency and voltage we extracted from them, at any time. This is not the same as withdrawing; it's simply a copy.</li>
             <li><strong>Access</strong> — ask us what we hold about you.</li>
         </ul>
         <p>We collect the bare minimum personal data needed to enforce these rights: a confirmable email address and the link between your account and your nodes. Nothing more.</p>

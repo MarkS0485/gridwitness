@@ -72,6 +72,24 @@
         </ol>
     </section>
 
+    <div class="section-divider-slim"></div>
+
+    <!-- Survey uploads -->
+    <section>
+        <h2 class="text-2xl font-bold text-tsgb-navy">Already running surveys? Contribute those too</h2>
+        <p class="text-gray-600 mt-2">
+            Electricians and engineers log power-quality surveys all the time — a week in one building,
+            a few days in another. Upload your analyser exports (CSV or PQDIF, up to 100 files at once)
+            and we keep <strong>only the frequency and voltage</strong>: current, power and everything
+            else are discarded before anything is stored. Every survey site is a fresh point on the
+            grid, so together they build a real-world voltage map nobody currently has.
+        </p>
+        <p class="text-sm text-gray-500 mt-3">
+            It stays your data — withdraw it or download a copy any time, and we never sell it.
+            <a asp-controller="Upload" asp-action="Index" class="text-tsgb-red font-semibold">Contribute a survey →</a>
+        </p>
+    </section>
+
     <div class="text-center pt-4">
         <a asp-area="Identity" asp-page="/Account/Register" class="btn-primary"><i class="fa-solid fa-bolt mr-2"></i>Start contributing</a>
     </div>

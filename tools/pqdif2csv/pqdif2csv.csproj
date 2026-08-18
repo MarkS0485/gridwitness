@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <!-- GSF.PQDIF ships only .NET Framework (net46/net48) assemblies, so this converter targets
+         net48. It is a standalone subprocess invoked by the survey_ingest worker; PQDIF support
+         therefore needs a Windows-hosted worker (the documented Task Scheduler deploy). Where the
+         worker runs in a Linux container the tool is simply absent and PQDIF files are skipped with
+         a manifest note — CSV/TXT exports still process everywhere. -->
+    <TargetFramework>net48</TargetFramework>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <AssemblyName>pqdif2csv</AssemblyName>
+    <RootNamespace>GridWitness.Pqdif2Csv</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Grid Solutions Framework PQDIF reader (IEEE 1159.3), MIT-licensed. The only mature PQDIF
+         implementation. Version floats to whatever restores (2.4.181 requested, 2.4.274 resolves). -->
+    <PackageReference Include="GSF.PQDIF" Version="2.4.181" />
+    <!-- Lets `dotnet build` target net48 without a full Visual Studio / targeting-pack install. -->
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />
+  </ItemGroup>
+
+</Project>

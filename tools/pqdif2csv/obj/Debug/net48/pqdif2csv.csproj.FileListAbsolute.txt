@@ -1,0 +1,17 @@
+D:\Work\gridwitness\tools\pqdif2csv\bin\Debug\net48\TagDefinitions.xml
+D:\Work\gridwitness\tools\pqdif2csv\bin\Debug\net48\pqdif2csv.exe.config
+D:\Work\gridwitness\tools\pqdif2csv\bin\Debug\net48\pqdif2csv.exe
+D:\Work\gridwitness\tools\pqdif2csv\bin\Debug\net48\pqdif2csv.pdb
+D:\Work\gridwitness\tools\pqdif2csv\bin\Debug\net48\Antlr3.Runtime.dll
+D:\Work\gridwitness\tools\pqdif2csv\bin\Debug\net48\ExpressionEvaluator.dll
+D:\Work\gridwitness\tools\pqdif2csv\bin\Debug\net48\GSF.Core.dll
+D:\Work\gridwitness\tools\pqdif2csv\bin\Debug\net48\GSF.PQDIF.dll
+D:\Work\gridwitness\tools\pqdif2csv\obj\Debug\net48\pqdif2csv.csproj.AssemblyReference.cache
+D:\Work\gridwitness\tools\pqdif2csv\obj\Debug\net48\pqdif2csv.GeneratedMSBuildEditorConfig.editorconfig
+D:\Work\gridwitness\tools\pqdif2csv\obj\Debug\net48\pqdif2csv.AssemblyInfoInputs.cache
+D:\Work\gridwitness\tools\pqdif2csv\obj\Debug\net48\pqdif2csv.AssemblyInfo.cs
+D:\Work\gridwitness\tools\pqdif2csv\obj\Debug\net48\pqdif2csv.csproj.CoreCompileInputs.cache
+D:\Work\gridwitness\tools\pqdif2csv\obj\Debug\net48\pqdif2csv.sourcelink.json
+D:\Work\gridwitness\tools\pqdif2csv\obj\Debug\net48\pqdif2csv.csproj.Up2Date
+D:\Work\gridwitness\tools\pqdif2csv\obj\Debug\net48\pqdif2csv.exe
+D:\Work\gridwitness\tools\pqdif2csv\obj\Debug\net48\pqdif2csv.pdb

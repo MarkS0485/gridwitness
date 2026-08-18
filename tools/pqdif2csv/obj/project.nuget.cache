@@ -1,0 +1,29 @@
+{
+  "version": 2,
+  "dgSpecHash": "PpNbLxW75JI=",
+  "success": true,
+  "projectFilePath": "D:\\Work\\gridwitness\\tools\\pqdif2csv\\pqdif2csv.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Mark Shirley\\.nuget\\packages\\antlr\\3.5.0.2\\antlr.3.5.0.2.nupkg.sha512",
+    "C:\\Users\\Mark Shirley\\.nuget\\packages\\expressionevaluator\\2.0.4\\expressionevaluator.2.0.4.nupkg.sha512",
+    "C:\\Users\\Mark Shirley\\.nuget\\packages\\gsf.core\\2.4.274\\gsf.core.2.4.274.nupkg.sha512",
+    "C:\\Users\\Mark Shirley\\.nuget\\packages\\gsf.pqdif\\2.4.274\\gsf.pqdif.2.4.274.nupkg.sha512",
+    "C:\\Users\\Mark Shirley\\.nuget\\packages\\microsoft.netframework.referenceassemblies\\1.0.3\\microsoft.netframework.referenceassemblies.1.0.3.nupkg.sha512",
+    "C:\\Users\\Mark Shirley\\.nuget\\packages\\microsoft.netframework.referenceassemblies.net48\\1.0.3\\microsoft.netframework.referenceassemblies.net48.1.0.3.nupkg.sha512"
+  ],
+  "logs": [
+    {
+      "code": "NU1603",
+      "level": "Warning",
+      "message": "pqdif2csv depends on GSF.PQDIF (>= 2.4.181) but GSF.PQDIF 2.4.181 was not found. GSF.PQDIF 2.4.274 was resolved instead.",
+      "projectPath": "D:\\Work\\gridwitness\\tools\\pqdif2csv\\pqdif2csv.csproj",
+      "warningLevel": 1,
+      "filePath": "D:\\Work\\gridwitness\\tools\\pqdif2csv\\pqdif2csv.csproj",
+      "libraryId": "GSF.PQDIF",
+      "targetGraphs": [
+        "net48",
+        "net48/win-x86"
+      ]
+    }
+  ]
+}

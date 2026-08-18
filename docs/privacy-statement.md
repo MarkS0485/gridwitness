@@ -6,6 +6,12 @@
 
 GridWitness measures the GB electricity grid using sensors you already own. We ask for the least revealing thing that is useful, which is grid frequency, and every step beyond that is an explicit, revocable choice you make. We will never ask for data we cannot justify to you.
 
+It is your data. We will never sell it; there is no profit motive here, we are interested in the readings themselves. We use them, and we make them available to the grid's system and network operators (NESO, the DNOs) so the whole system understands itself better. You can withdraw at any time and take a copy of your data with you.
+
+## Contributing a survey
+
+Electricians and engineers already running power-quality surveys can upload their analyser exports (CSV or PQDIF). We keep only the frequency and voltage from each file; current, power, harmonics and everything else are discarded before anything is stored, by a strict extraction allow-list rather than a promise. Because a voltage reading is only useful pinned to a place, surveys carry at least a region. A postcode, if you give one, stays private and becomes only a coarse grid area. Every survey is yours to withdraw or download at any time.
+
 ## What each thing tells us, and how sensitive it is
 
 **Grid frequency** is the single number that is the same for everyone connected to the GB grid at a given instant. Sharing it tells us nothing about your household, because it is identical whether measured at your house or the house next door. This is the default, and on its own it is genuinely useful.
@@ -31,7 +37,8 @@ Your postcode and precise location, the link between a node and you, and your ac
 ## Your rights
 
 * Change or withdraw any consent at any time from the integration's options.
-* Delete all your data. The "delete my data" action removes your server record and marks your already contributed data for removal from the research lake.
+* Delete all your data. The "delete my data" / "withdraw this survey" action removes your server record and raw files, and drops your already contributed data from the research lake on the next cycle. The one thing that cannot be un-made is analysis already built while your data was live (aggregate maps, trained models, fused datasets); none of it identifies you or your site.
+* Take your data with you. "Download my data" gives you a zip of your uploaded files and the frequency and voltage extracted from them, at any time. This is a copy, not a withdrawal.
 * Ask us what we hold about you.
 
 ## Legal basis and controller

@@ -1,0 +1,48 @@
+@model SurveyReceivedVm
+@{
+    ViewData["Title"] = "Survey received";
+    ViewData["Section"] = "upload";
+}
+
+<section class="uk-gradient-hero text-white">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 py-10">
+        <h1 class="text-3xl font-bold"><i class="fa-solid fa-circle-check mr-2"></i>Thank you — survey received</h1>
+        <p class="text-white/80 mt-1">Your files are queued. We'll extract the frequency and voltage shortly.</p>
+    </div>
+</section>
+
+<div class="max-w-3xl mx-auto px-4 sm:px-6 py-8 space-y-6">
+    <div class="glass-panel rounded-lg p-6">
+        <p class="text-lg">
+            <strong>@Model.Accepted</strong> file@(Model.Accepted == 1 ? "" : "s") accepted and queued for processing.
+        </p>
+        <p class="text-sm text-gray-500 mt-1 font-mono">Survey id: @Model.NodeId</p>
+
+        @if (Model.Rejected.Count > 0)
+        {
+            <div class="alert alert-warning mt-4">
+                <div>
+                    <strong>@Model.Rejected.Count file@(Model.Rejected.Count == 1 ? " was" : "s were") skipped</strong>
+                    (unsupported type):
+                    <ul class="list-disc ml-5 mt-1 text-sm">
+                        @foreach (var r in Model.Rejected)
+                        {
+                            <li><span class="font-mono">@r.Filename</span> — @r.Reason</li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        }
+
+        <p class="text-sm text-gray-600 mt-4">
+            Only frequency and voltage are extracted; everything else in the files is discarded. Once
+            processed, this survey appears in your list, where you can withdraw it or download a copy
+            at any time.
+        </p>
+    </div>
+
+    <div class="flex items-center gap-3">
+        <a asp-action="Surveys" class="btn-primary">View my surveys</a>
+        <a asp-action="Index" class="btn-outline">Upload another</a>
+    </div>
+</div>

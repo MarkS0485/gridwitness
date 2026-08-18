@@ -1,0 +1,26 @@
+[project]
+name = "gridwitness-survey-ingest"
+version = "0.1.0"
+description = "Out-of-band worker: parse electricians' power-quality survey files into GridWitness CSV staging (frequency + voltage only)."
+requires-python = ">=3.11"
+license = { text = "MIT" }
+# pandas is used only for tolerant timestamp parsing of heterogeneous logger exports. It is
+# deliberately NOT a dependency of the FastAPI ingest server (kept light) — it lives here, in the
+# out-of-band worker, exactly as the GDA acquirer keeps pandas/pyarrow out of the server image.
+dependencies = [
+    "pandas>=2.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "fastapi>=0.110",       # end-to-end pipeline test drives the real upload endpoint
+    "httpx>=0.27",
+    "python-multipart>=0.0.9",
+]
+
+[project.scripts]
+gridwitness-survey-ingest = "survey_ingest:main"
+
+[tool.pytest.ini_options]
+testpaths = ["."]

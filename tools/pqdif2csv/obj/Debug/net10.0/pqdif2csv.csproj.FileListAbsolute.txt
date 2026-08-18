@@ -1,0 +1,6 @@
+D:\Work\gridwitness\tools\pqdif2csv\obj\Debug\net10.0\pqdif2csv.csproj.AssemblyReference.cache
+D:\Work\gridwitness\tools\pqdif2csv\obj\Debug\net10.0\pqdif2csv.GeneratedMSBuildEditorConfig.editorconfig
+D:\Work\gridwitness\tools\pqdif2csv\obj\Debug\net10.0\pqdif2csv.AssemblyInfoInputs.cache
+D:\Work\gridwitness\tools\pqdif2csv\obj\Debug\net10.0\pqdif2csv.AssemblyInfo.cs
+D:\Work\gridwitness\tools\pqdif2csv\obj\Debug\net10.0\pqdif2csv.csproj.CoreCompileInputs.cache
+D:\Work\gridwitness\tools\pqdif2csv\obj\Debug\net10.0\pqdif2csv.sourcelink.json

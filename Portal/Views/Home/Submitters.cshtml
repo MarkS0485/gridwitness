@@ -54,4 +54,9 @@
         <h2 class="text-xl font-bold text-tsgb-navy">Submitting on behalf of other people?</h2>
         <p class="text-gray-600 mt-2">Honour the same deal the Home Assistant integration makes: only register the channels the person agreed to share (current and power are never a default), never put personal data in rows, and support withdrawal. Historical backfill is welcome — rows keep their original timestamps and gaps stay visible rather than being papered over.</p>
     </section>
+
+    <section class="glass-panel rounded-lg p-6">
+        <h2 class="text-xl font-bold text-tsgb-navy">Got survey files, not a live feed?</h2>
+        <p class="text-gray-600 mt-2">If you have power-quality survey exports (CSV or PQDIF) rather than a streaming node, you don't need the API at all — just <a asp-controller="Upload" asp-action="Index" class="text-tsgb-red font-semibold">upload them</a>. We keep only frequency and voltage, tie the survey to your account, and let you withdraw or download it at any time.</p>
+    </section>
 </div>

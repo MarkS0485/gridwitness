@@ -64,6 +64,13 @@ HIGH_SENSITIVITY_CHANNELS: frozenset[str] = frozenset(
     k for k, v in CHANNEL_CATALOGUE.items() if v["sensitivity"] == "high"
 )
 
+# Power-quality survey ingestion (electricians' logger exports). A survey is an ordinary node tagged
+# with this producer, consenting only to the two safe electrical channels: frequency (node-global,
+# reveals nothing) and voltage (a property of the local feeder, not the occupant). The survey_ingest
+# worker extracts ONLY these from uploaded files — everything else in a file is dropped at source.
+SURVEY_PRODUCER = "gridwitness-survey"
+SURVEY_CHANNELS: list[str] = ["frequency_hz", "voltage_v"]
+
 
 class LocTier(str, Enum):
     anon = "anon"

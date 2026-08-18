@@ -11,6 +11,8 @@ or the node is treated as not found (so the portal cannot touch another account'
 """
 from __future__ import annotations
 
+import shutil
+
 from fastapi import APIRouter, Depends, HTTPException, Request
 
 from .auth import require_internal
@@ -72,4 +74,11 @@ def update_node(
 def delete_node(node_id: str, contributor_ref: str, request: Request) -> dict:
     _owned_node(request, node_id, contributor_ref)
     deleted = request.app.state.db.delete_node(node_id)
+    if deleted:
+        # Withdrawal removes the raw contribution now: purge any survey files (queued in inbox or
+        # already parsed into archive). The tombstone drops the derived rows from the lake on the
+        # next acquisition cycle. Analysis already built while the data was live can't be un-made.
+        settings = request.app.state.settings
+        for d in (settings.surveys_inbox / node_id, settings.surveys_archive / node_id):
+            shutil.rmtree(d, ignore_errors=True)
     return {"node_id": node_id, "deleted": deleted, "tombstoned": deleted}

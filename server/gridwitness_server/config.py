@@ -54,10 +54,27 @@ class Settings:
             internal_key=internal_key,
         )
 
+    # Survey-file ingestion lives under the staging tree so the out-of-band survey_ingest worker
+    # (which already knows staging_dir) finds it with no extra config. Raw uploads land in inbox/,
+    # move to archive/ once parsed; both are private contributor data, never the published lake.
+    @property
+    def surveys_dir(self) -> Path:
+        return self.staging_dir / "surveys"
+
+    @property
+    def surveys_inbox(self) -> Path:
+        return self.surveys_dir / "inbox"
+
+    @property
+    def surveys_archive(self) -> Path:
+        return self.surveys_dir / "archive"
+
     def ensure_dirs(self) -> None:
         self.data_dir.mkdir(parents=True, exist_ok=True)
         (self.staging_dir / "electrical").mkdir(parents=True, exist_ok=True)
         (self.staging_dir / "weather").mkdir(parents=True, exist_ok=True)
+        self.surveys_inbox.mkdir(parents=True, exist_ok=True)
+        self.surveys_archive.mkdir(parents=True, exist_ok=True)
 
 
 def get_settings() -> Settings:

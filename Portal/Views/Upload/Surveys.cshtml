@@ -1,0 +1,114 @@
+@model SurveyListVm
+@{
+    ViewData["Title"] = "My surveys";
+    ViewData["Section"] = "upload";
+}
+
+<section class="uk-gradient-hero text-white">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-10">
+        <div class="flex flex-wrap items-center justify-between gap-4">
+            <div>
+                <h1 class="text-3xl font-bold">My surveys</h1>
+                <p class="text-white/80 mt-1">The power-quality surveys you've contributed. Your data, always.</p>
+            </div>
+            <div class="flex items-center gap-2">
+                <a asp-action="Export" class="btn-secondary"><i class="fa-solid fa-download mr-2"></i>Download my data</a>
+                <a asp-action="Index" class="btn-primary"><i class="fa-solid fa-plus mr-2"></i>Contribute a survey</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="max-w-6xl mx-auto px-4 sm:px-6 py-8 space-y-4">
+
+    @if (TempData["Message"] is string msg)
+    {
+        <div class="alert alert-success">@msg</div>
+    }
+    @if (TempData["Error"] is string terr)
+    {
+        <div class="alert alert-danger">@terr</div>
+    }
+    @if (Model.Error is not null)
+    {
+        <div class="alert alert-warning">@Model.Error</div>
+    }
+
+    @if (!Model.EmailConfirmed)
+    {
+        <div class="alert alert-warning">
+            <i class="fa-solid fa-triangle-exclamation mt-0.5"></i>
+            <div>
+                <strong>Your email isn't confirmed yet.</strong>
+                You can contribute surveys now, but you'll need a confirmed email to <em>withdraw</em>
+                a survey or <em>download your data</em> — that's how we prove the account is yours.
+                <a asp-area="Identity" asp-page="/Account/ResendEmailConfirmation" class="font-semibold underline">Resend confirmation email</a>.
+            </div>
+        </div>
+    }
+
+    @if (Model.Surveys.Count == 0)
+    {
+        <div class="glass-panel rounded-lg p-10 text-center">
+            <div class="card-icon mx-auto mb-4"><i class="fa-solid fa-wave-square"></i></div>
+            <h2 class="text-xl font-bold text-tsgb-navy">No surveys yet</h2>
+            <p class="text-gray-600 mt-2 max-w-md mx-auto">
+                Contribute the frequency and voltage from a power-quality survey you've already run.
+                It helps build a real-world map of the grid, and it stays your data.
+            </p>
+            <a asp-action="Index" class="btn-primary mt-5"><i class="fa-solid fa-cloud-arrow-up mr-2"></i>Contribute your first survey</a>
+        </div>
+    }
+    else
+    {
+        <div class="grid gap-4 md:grid-cols-2">
+            @foreach (var n in Model.Surveys)
+            {
+                <div class="card p-5">
+                    <div class="flex items-start justify-between gap-3">
+                        <div class="min-w-0">
+                            <div class="font-bold text-tsgb-navy truncate">@(string.IsNullOrEmpty(n.DeviceType) ? "Survey" : n.DeviceType)</div>
+                            <div class="text-xs text-gray-400 font-mono truncate">@n.NodeId</div>
+                        </div>
+                        <span class="status-pill online">Survey</span>
+                    </div>
+
+                    <div class="mt-3 flex flex-wrap gap-1.5">
+                        @foreach (var ch in n.Channels)
+                        {
+                            <span class="text-xs px-2 py-0.5 rounded-full bg-tsgb-navy/6 text-tsgb-navy">@GridWitnessCatalogue.ChannelLabel(ch)</span>
+                        }
+                    </div>
+
+                    <div class="mt-4 flex items-center justify-between text-sm">
+                        <span class="text-gray-500">
+                            @if (!string.IsNullOrEmpty(n.LocRef))
+                            {
+                                <i class="fa-solid fa-location-dot mr-1"></i>
+                                <span class="font-mono">@n.LocRef</span>
+                            }
+                            else
+                            {
+                                <span class="text-gray-400">No location</span>
+                            }
+                        </span>
+                        <form asp-action="Withdraw" asp-route-id="@n.NodeId" method="post"
+                              onsubmit="return confirm('Withdraw this survey? Your files are removed and the readings drop from the research lake on the next cycle. This cannot be undone.');">
+                            <button type="submit" class="text-tsgb-red font-semibold"
+                                    @(Model.EmailConfirmed ? "" : "disabled")
+                                    title="@(Model.EmailConfirmed ? "Withdraw this survey" : "Confirm your email first")">
+                                Withdraw <i class="fa-solid fa-trash-can text-xs"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            }
+        </div>
+
+        <p class="text-sm text-gray-500 mt-2">
+            <i class="fa-solid fa-circle-info mr-1"></i>
+            Withdrawing removes your raw files and drops the readings from the lake on the next cycle.
+            Analysis already built while the data was live can't be un-made — but nothing in it identifies you or your site.
+        </p>
+    }
+</div>
