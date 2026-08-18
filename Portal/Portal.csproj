@@ -22,7 +22,7 @@
 
   <ItemGroup>
     <!-- The single shared estate EF model (unified ApplicationDbContext). -->
-    <ProjectReference Include="..\..\Estate.Data\Estate.Data.csproj" />
+    <PackageReference Include="Estate.Data" Version="1.0.0" />
   </ItemGroup>
 
   <ItemGroup>

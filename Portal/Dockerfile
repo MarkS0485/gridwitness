@@ -1,10 +1,11 @@
+# syntax=docker/dockerfile:1.7
 # GridWitness account portal (ASP.NET Core 10 MVC). The Tailwind standalone CLI is downloaded by the
 # BuildTailwindCss MSBuild target during publish (no Node). Accounts SQLite lives under /app/App_Data.
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
 
-COPY Portal.csproj ./
-RUN dotnet restore Portal.csproj
+COPY Portal.csproj nuget.config ./
+RUN --mount=type=secret,id=gh_packages_token,env=GH_PACKAGES_TOKEN  dotnet restore Portal.csproj
 
 COPY . .
 RUN dotnet publish Portal.csproj -c Release -o /app

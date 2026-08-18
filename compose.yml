@@ -44,7 +44,10 @@ services:
     restart: unless-stopped
 
   portal:
-    build: ./Portal
+    build:
+      context: ./Portal
+      secrets:
+        - gh_packages_token
     # .env supplies the shared SQL Server connection (ConnectionStrings__DefaultConnection) and
     # GW_INTERNAL_KEY. It is the same estate DB every app's SSO uses.
     env_file:
@@ -91,3 +94,9 @@ services:
 networks:
   estate-data:
     external: true
+
+secrets:
+  # Private GitHub Packages token for restoring Estate.Data at build time (host
+  # GH_PACKAGES_TOKEN env var). export GH_PACKAGES_TOKEN=$(gh auth token) before build.
+  gh_packages_token:
+    environment: GH_PACKAGES_TOKEN
